@@ -4,8 +4,8 @@ IMAGE_FORMAT=$2
 
 usage() {
 	echo "Usage: gcp-export-images BUCKET_NAME [IMAGE_FORMAT]"
-	echo "Supported image formats: vmdk (default), vhdx, vpc, vdi and qcow2"
-	echo "Requires Google SDK: gcloud, gsutil and alpha commands"
+	echo "Supported image formats: vmdk (default), vhdx, vpc, vdi, raw and qcow2"
+	#echo "Requires Google SDK: gcloud, gsutil and alpha commands"
 	
 }
 
