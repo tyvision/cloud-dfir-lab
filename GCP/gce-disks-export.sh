@@ -1,29 +1,12 @@
-#!/bin/bash
-##
-## gce-disks-export: Export Google Cloud instances disks to Cloud Storage
-## MIT License | Copyright (c) 2019 Fabio Ferrari
-## GitHub repository: https://github.com/fabio-particles/gce-disks-export
-##
-## This software comes with ABSOLUTELY NO WARRANTY.
-## This is free software, and you are welcome to redistribute it under certain conditions.
-## More info about me visit: https//particles.io
-
 GCE_DISKS=$(gcloud compute disks list | awk '{print $1}' | sed -n '2,$p')
 BUCKET_NAME=$1
 IMAGE_FORMAT=$2
 
 usage() {
 	echo "Usage: gcp-export-images BUCKET_NAME [IMAGE_FORMAT]"
-	echo "Supported image formats: vmdk (default), vhdx, vpc, vdi, and qcow2"
+	echo "Supported image formats: vmdk (default), vhdx, vpc, vdi and qcow2"
 	echo "Requires Google SDK: gcloud, gsutil and alpha commands"
-	credits
-}
-
-credits() {
-	echo "---"
-	echo "MIT License | Copyright (c) 2019 Fabio Ferrari"
-	echo "GitHub repository: https://github.com/fabio-particles/gce-disks-export"
-	echo "---"
+	
 }
 
 delete_image() {
