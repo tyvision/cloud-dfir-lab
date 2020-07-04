@@ -104,5 +104,5 @@ for diskname in $GCE_DISKS
 		delete_image $diskname
 done
 
-credits
+
 echo "Export is complete"
