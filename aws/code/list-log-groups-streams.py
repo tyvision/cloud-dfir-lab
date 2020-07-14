@@ -21,7 +21,8 @@ def arguments():
 
 def list_regions():
     # this must be 'ec2'
-    client = boto3.client( 'ec2' )
+    # region can be any valid region
+    client = boto3.client( 'ec2', region_name='us-east-1' )
     responce = client.describe_regions()
     names = [region['RegionName'] for region in responce['Regions']]
     return names
