@@ -12,16 +12,12 @@ from pprint import pprint
 def arguments():
     parser = argparse.ArgumentParser(description='''
     Show the hierarchy Regions -> LogGroups -> LogStreams
+    This script does not take any arguments.
     Credentials are read from ~/.aws/config or
     see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
     ''')
 
-    parser.add_argument('-o', '--outdir', type=str, default="./",
-        help='Path to output directory, by default current directory'
-    )
-
-    args = parser.parse_args()
-    return args
+    return None
 
 def list_regions():
     # this must be 'ec2'
