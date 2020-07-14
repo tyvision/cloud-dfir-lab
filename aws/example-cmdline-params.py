@@ -12,12 +12,24 @@ Credentials are read from ~/.aws/config or
 see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
 ''')
 
-parser.add_argument('log_group', type=str, help='Name of the log-group')
-parser.add_argument('log_stream', type=str, help='Name of the log-stream within the log-group')
-parser.add_argument('-r', '--awsregion', type=str, help='AWS region e.g. us-east-1. Overwrites the region specified in ~/.aws/config')
-parser.add_argument('-o', '--outdir', type=str, help='Path to output directory')
-parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, help='Start time for events in iso format e.g. 2020-07-14T00:33:24')
-parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, help='End time for events in iso format e.g. 2020-07-14T00:33:24')
+parser.add_argument('log_group', type=str,
+    help='Name of the log-group'
+)
+parser.add_argument('log_stream', type=str,
+    help='Name of the log-stream within the log-group'
+)
+parser.add_argument('-r', '--awsregion', type=str,
+    help='AWS region e.g. us-east-1. Overwrites the region specified in ~/.aws/config'
+)
+parser.add_argument('-o', '--outdir', type=str, default="./"
+    help='Path to output directory'
+)
+parser.add_argument('-s', '--timestart', type=datetime.fromisoformat,
+    help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
+)
+parser.add_argument('-e', '--timeend', type=datetime.fromisoformat,
+    help='End time for events in iso format e.g. 2020-07-14T00:33:24'
+)
 
 args = parser.parse_args()
 

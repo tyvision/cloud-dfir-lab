@@ -16,12 +16,24 @@ def arguments():
     see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
     ''')
 
-    parser.add_argument('namespace', type=str, help='Namespace where metric is hosted e.g. "AWS/EC2" or https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html')
-    parser.add_argument('metric', type=str, help='Name of the metric e.g. "NetworkOut" or https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html')
-    parser.add_argument('-r', '--awsregion', type=str, help='AWS region e.g. us-east-1. Overwrites the region specified in ~/.aws/config')
-    parser.add_argument('-o', '--outdir', type=str, help='Path to output directory')
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, help='Start time for events in iso format e.g. 2020-07-14T00:33:24')
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, help='End time for events in iso format e.g. 2020-07-14T00:33:24')
+    parser.add_argument('namespace', type=str,
+        help='Namespace where metric is hosted e.g. "AWS/EC2" or https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html'
+    )
+    parser.add_argument('metric', type=str,
+        help='Name of the metric e.g. "NetworkOut" or https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html'
+    )
+    parser.add_argument('-r', '--awsregion', type=str,
+        help='AWS region e.g. us-east-1. Overwrites the region specified in ~/.aws/config'
+    )
+    parser.add_argument('-o', '--outdir', type=str, default="./",
+        help='Path to output directory'
+    )
+    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat,
+        help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
+    )
+    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat,
+        help='End time for events in iso format e.g. 2020-07-14T00:33:24'
+    )
 
     return parser.parse_args()
 
