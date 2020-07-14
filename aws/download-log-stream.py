@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Test with
-# ./download-log-stream.py 'us-east-2' 'RDSOSMetrics' 'db-KQFXALKUCZHCARNXDMBWEKSUSY' -o tmp -s 2020-01-01T00:00:01 -e 2020-09-01T00:00:01
+# ./download-log-stream.py 'us-east-2' 'RDSOSMetrics' 'db-KQFXALKUCZHCARNXDMBWEKSUSY' -o tmp -s 2020-01-01T00:00:01 -e 2020-10-01T00:00:01
 #
 import boto3
 from botocore.config import Config
@@ -29,10 +29,10 @@ def arguments():
     parser.add_argument('-o', '--outdir', type=str, default="./",
         help='Path to output directory, by default current directory'
     )
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat,
+    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default="3000-01-01T:00:00:00"
         help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
     )
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat,
+    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default="2000-01-01T:00:00:00"
         help='End time for events in iso format e.g. 2020-07-14T00:33:24'
     )
 
