@@ -30,10 +30,10 @@ def arguments():
     parser.add_argument('-o', '--outdir', type=str, default="./",
         help='Path to output directory, by default current directory'
     )
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default=datetime.fromisoformat("3000-01-01T:00:00:00"),
+    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default=datetime.fromisoformat("3000-01-01T00:00:00"),
         help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
     )
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default=datetime.fromisoformat("2000-01-01T:00:00:00"),
+    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default=datetime.fromisoformat("2000-01-01T00:00:00"),
         help='End time for events in iso format e.g. 2020-07-14T00:33:24'
     )
 
