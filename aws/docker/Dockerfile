@@ -14,10 +14,10 @@ RUN apk add --no-cache python3
 
 WORKDIR /root/cloud
 
-COPY ./config   /root/cloud
+COPY ./config/requirements.txt  /root/cloud/
 RUN pip3 install -r requirements.txt
 
-COPY ./code     /root/cloud
+COPY ./code/*.py    /root/cloud/
 
 # to extract downloaded log files mount to local ./output directory via --mount
 CMD ["./cli-choose-logs.py", "-o", "/output"]

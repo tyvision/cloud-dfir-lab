@@ -9,6 +9,7 @@ Getting started:
 
 0) Clone the repository
 $ git clone https://github.com/tyvision/cloud-dfir-lab
+$ cd cloud-dfir-lab/aws
 
 1) Setup aws-credentials.env file by copying and editing config/example-aws-credentials.env
 $ cp config/example-aws-credentials.env aws-credentials.env
@@ -21,7 +22,7 @@ $ docker build -t temach/cloud-1 -f docker/Dockerfile .
 $ mkdir output
 
 4) Run docker
-$ docker run -it --env-file=config/aws-credentials.env --mount type=bind,src=$(pwd)/output,dst=/output temach/cloud-1
+$ docker run -it --env-file=aws-credentials.env --mount type=bind,src=$(pwd)/output,dst=/output temach/cloud-1
 
 5) View log files
 $ ls -la output
