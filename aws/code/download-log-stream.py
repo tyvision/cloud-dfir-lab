@@ -30,11 +30,11 @@ def arguments():
     parser.add_argument('-o', '--outdir', type=str, default="./",
         help='Path to output directory, by default current directory'
     )
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default=datetime.fromisoformat("3000-01-01T00:00:00"),
-        help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
+    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default=datetime.fromisoformat("2000-01-01T00:00:00"),
+        help='Start time (earlier) for events in iso format e.g. 2020-07-14T00:33:24'
     )
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default=datetime.fromisoformat("2000-01-01T00:00:00"),
-        help='End time for events in iso format e.g. 2020-07-14T00:33:24'
+    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default=datetime.fromisoformat("3000-01-01T00:00:00"),
+        help='End time (later) for events in iso format e.g. 2020-07-14T00:33:24'
     )
 
     return parser.parse_args()
@@ -57,12 +57,15 @@ def get_valid_fname(s):
     s = s.replace('.', '-')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
+def time2boto(t):
+    return int(t.timestamp()) * 1000
+
 def download_log_stream(local_dir, client, log_group, log_stream, tstart, tend):
     responce = client.get_log_events(
         logGroupName=log_group,
         logStreamName=log_stream,
-        startTime=int(tstart.timestamp()),
-        endTime=int(tend.timestamp())
+        startTime=time2boto(tstart),
+        endTime=time2boto(tend)
     )
     stream_fs_name = "{}_{}_{}".format(client._client_config.region_name, log_group, log_stream)
     sanitised_stream_fs_name = get_valid_fname(stream_fs_name) + ".json"

@@ -29,10 +29,10 @@ def arguments():
         help='Path to output directory'
     )
     parser.add_argument('-s', '--timestart', type=datetime.fromisoformat,
-        help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
+        help='Start time (earlier) for events in iso format e.g. 2020-07-14T00:33:24'
     )
     parser.add_argument('-e', '--timeend', type=datetime.fromisoformat,
-        help='End time for events in iso format e.g. 2020-07-14T00:33:24'
+        help='End time (later) for events in iso format e.g. 2020-07-14T00:33:24'
     )
 
     return parser.parse_args()
@@ -54,6 +54,9 @@ def list_metrics(args, client):
 
     print("Listing: ", response)
 
+def time2boto(t):
+    return int(t.timestamp()) * 1000
+
 def get_statistics(args, client):
     response = client.get_metric_statistics(
         Namespace=args.namespace,
@@ -64,8 +67,8 @@ def get_statistics(args, client):
                 'Value': 't2.micro'
             },
         ],
-        StartTime=args.timestart,
-        EndTime=args.timeend,
+        StartTime=time2boto(args.timestart),
+        EndTime=time2boto(args.timeend),
         Period=120,
         Statistics=[
             'Average'
