@@ -4,6 +4,8 @@ Automate working with cloud logs:
 2) Transform them.
 3) Feed them into plaso as event sources.
 
+Every python script has example command line of how to run it in the file header.
+
 
 Getting started with code:
 
@@ -15,6 +17,8 @@ $ cd cloud-dfir-lab/aws
 $ mkdir ~/.aws/
 $ cp config/example-aws-config.ini ~/.aws/config.ini
 $ vim ~/.aws/config.ini
+
+for windows the path is: %UserProfile%\.aws\config.ini
 
 2) Install requirements and run scripts with python3. Check the script header for example arguments.
 $ pip install -r config/requirements.txt
