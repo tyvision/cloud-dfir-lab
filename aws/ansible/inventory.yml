@@ -1,0 +1,13 @@
+# see https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+# see https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html
+all:
+  children:
+    group_logcollectors:
+      hosts:
+        ec2-52-202-17-121.compute-1.amazonaws.com:
+          ansible_port: 22
+          ansible_host: ec2-52-202-17-121.compute-1.amazonaws.com
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ../config/example_ec2_key
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_become_method: sudo

@@ -1,0 +1,17 @@
+---
+- hosts: group_logcollectors
+
+  tasks:
+    - name: Install pre-requisites
+      become: yes
+      apt:
+        update_cache: yes
+        pkg:
+          - git
+          - python3-pip
+          - docker.io
+
+    - name: Clone code
+      git:
+        repo: 'https://foosball.example.org/path/to/repo.git'
+        dest: /srv/checkout
