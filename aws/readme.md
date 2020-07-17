@@ -5,7 +5,23 @@ Automate working with cloud logs:
 3) Feed them into plaso as event sources.
 
 
-Getting started:
+Getting started with code:
+
+0) Clone the repository
+$ git clone https://github.com/tyvision/cloud-dfir-lab
+$ cd cloud-dfir-lab/aws
+
+1) Setup credentials by copying and editing aws-config.ini
+$ mkdir ~/.aws/
+$ cp config/example-aws-config.ini ~/.aws/config.ini
+$ vim ~/.aws/config.ini
+
+2) Install requirements and run scripts with python3. Check the script header for example arguments.
+$ pip install -r config/requirements.txt
+$ python code/cli-choose-logs.py --help
+
+
+Getting started with Docker:
 
 0) Clone the repository
 $ git clone https://github.com/tyvision/cloud-dfir-lab
@@ -26,4 +42,3 @@ $ docker run -it --env-file=aws-credentials.env --mount type=bind,src=$(pwd)/out
 
 5) View log files
 $ ls -la output
-
