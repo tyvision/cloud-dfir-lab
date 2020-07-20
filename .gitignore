@@ -1,6 +1,7 @@
 venv
 .idea
 aws-credentials.env
+docker-credentials.env
 .terraform
 *.tfstate
 *.tfstate.backup
