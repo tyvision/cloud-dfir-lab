@@ -1,8 +1,8 @@
-# credentials as ENV variables, necessary to run code in docker
+# credentials as shell ENV variables
 #
-# docker run --env-file aws.credentials.env
+# source ./aws/config/example-aws-credentials.env
 #
 # see Configuration: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html
 # see Credentials: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
-AWS_ACCESS_KEY_ID=XXX
-AWS_SECRET_ACCESS_KEY=XXX
+export AWS_ACCESS_KEY_ID=XXX
+export AWS_SECRET_ACCESS_KEY=XXX

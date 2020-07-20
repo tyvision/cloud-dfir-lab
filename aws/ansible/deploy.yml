@@ -1,5 +1,17 @@
+# Test with
+# ansible-playbook --check -i inventory.yml deploy.yml
+#
+# Run with
+# ansible-playbook -i inventory.yml deploy.yml
+#
 ---
-- hosts: group_logcollectors
+- name: Configure laboratory for Cloud Digital Forencics Incident Responce
+
+  hosts: group_logcollectors
+
+  vars:
+      v_proj: "~/cloud-dfir"
+      v_aws_env: "aws-credentials.sh"
 
   tasks:
     - name: Install pre-requisites
@@ -7,11 +19,52 @@
       apt:
         update_cache: yes
         pkg:
-          - git
           - python3-pip
-          - docker.io
 
-    - name: Clone code
-      git:
-        repo: 'https://foosball.example.org/path/to/repo.git'
-        dest: /srv/checkout
+    - name: Create project directory
+      file:
+        path: "{{ v_proj }}"
+        state: directory
+        mode: '700'
+
+    - name: Check if security config already exists {{ v_proj }}/{{ v_aws_env }}
+      stat:
+        path: "{{ v_proj }}/{{ v_aws_env }}"
+      register: file_aws
+
+    - name: Copy example security config
+      copy:
+        src: "{{ playbook_dir }}/../config/example-aws-credentials.sh"
+        dest: "{{ v_proj }}/{{ v_aws_env }}"
+      when: not file_aws.stat.exists
+
+    - name: Set bash to read AWS security variables from security config
+      lineinfile:
+        dest: "~/.bashrc"
+        regexp: "source.*{{ v_aws_env }}"
+        insertafter: EOF
+        line: "source {{ v_proj }}/{{ v_aws_env}}"
+
+    - name: Copy code dependencies config
+      copy:
+        src: "{{ playbook_dir }}/../config/requirements.txt"
+        dest: "{{ v_proj }}/"
+
+    - name: Install code dependencies
+      pip:
+        state: latest
+        requirements: "{{ v_proj }}/requirements.txt"
+
+    - name: Copy code
+      copy:
+        src: "{{ playbook_dir }}/../code/"
+        dest: "{{ v_proj }}/code"
+        mode: '700'
+
+    - name: "Set credentials manually post-install"
+      debug:
+        msg:
+          - "To complete this deployment manually set the environment variables"
+          - "AWS_ACCESS_KEY_ID=XXX"
+          - "AWS_SECRET_ACCESS_KEY=XXX"
+          - "You can set them in {{ v_proj }}/{{ v_aws_env }} file, it will be sourced from ~/.bashrc automatically."

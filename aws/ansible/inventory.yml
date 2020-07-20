@@ -1,3 +1,6 @@
+# Test with
+# ansible -i inventory.yml all --list-hosts
+#
 # see https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
 # see https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html
 all:
