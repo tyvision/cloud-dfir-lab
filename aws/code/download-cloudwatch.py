@@ -1,85 +1,65 @@
 #!/usr/bin/env python
 #
 # Test with
-# ./download-cloudwatch.py -r us-east-1 -s 2020-06-25 -e 2020-06-26 AWS/EC2 NetworkOut
+# ./download-cloudwatch.py us-east-2 AWS/EC2 NetworkOut -s 2020-06-01T00:00:00 -e 2020-07-20T00:00:00
+#
+# Test api with
+# aws cloudwatch get-metric-statistics \
+#    --region us-east-2 \
+#    --namespace AWS/EC2 \
+#    --metric-name NetworkOut \
+#    --period 3600  --statistics "Average" \
+#    --start-time 2020-06-01T23:18:00 \
+#    --end-time 2020-07-20T23:18:00
 #
 import boto3
-from botocore.config import Config
+import json
 
-import argparse
-from datetime import datetime
+from pprint import pprint
 
-def arguments():
-    parser = argparse.ArgumentParser(description='''
-    Download logs from AWS.
-    Credentials are read from ~/.aws/config or
-    see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
-    ''')
+import importlib
+lib_utils = importlib.import_module("lib-utils")
 
-    parser.add_argument('namespace', type=str,
-        help='Namespace where metric is hosted e.g. "AWS/EC2" or https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html'
-    )
-    parser.add_argument('metric', type=str,
-        help='Name of the metric e.g. "NetworkOut" or https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html'
-    )
-    parser.add_argument('-r', '--awsregion', type=str,
-        help='AWS region e.g. us-east-1. Overwrites the region specified in ~/.aws/config'
-    )
-    parser.add_argument('-o', '--outdir', type=str, default="./",
-        help='Path to output directory'
-    )
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat,
-        help='Start time (earlier) for events in iso format e.g. 2020-07-14T00:33:24'
-    )
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat,
-        help='End time (later) for events in iso format e.g. 2020-07-14T00:33:24'
-    )
 
-    return parser.parse_args()
+def get_parser():
+    helptext="Download metrics from Cloud Watch."
+    args = [
+        "region"
+        , "namespace"
+        , "metric"
+        , "outdir"
+        , "timestart"
+        , "timeend"
+    ]
+    return lib_utils.get_parser(helptext, args)
 
-def open_aws_entity(args):
-    custom_config = Config(
-        region_name=args.awsregion
-    )
 
-    # boto3 will automatically use parameters from custom Config if they are not None
-    client = boto3.client('cloudwatch', config=custom_config)
-    return client
+def download_metric(region, namespace, metric, timestart, timeend):
+    client = boto3.client('cloudwatch', region_name=region)
 
-def list_metrics(args, client):
-    response = client.list_metrics(
-        Namespace=args.namespace,
-        MetricName=args.metric
-    )
-
-    print("Listing: ", response)
-
-def time2boto(t):
-    return int(t.timestamp()) * 1000
-
-def get_statistics(args, client):
-    response = client.get_metric_statistics(
-        Namespace=args.namespace,
-        MetricName=args.metric,
-        Dimensions=[
-            {
-                'Name': 'InstanceType',
-                'Value': 't2.micro'
-            },
-        ],
-        StartTime=time2boto(args.timestart),
-        EndTime=time2boto(args.timeend),
-        Period=120,
+    responce = client.get_metric_statistics(
+        Namespace=namespace,
+        MetricName=metric,
+        # Dimensions=[
+        #     {
+        #         'Name': 'InstanceType',
+        #         'Value': 't2.micro'
+        #     },
+        # ],
+        StartTime=timestart,
+        EndTime=timeend,
+        Period=3600,
         Statistics=[
             'Average'
         ],
-        Unit='Kilobytes'
+        Unit='Bytes'
     )
 
-    print('Result:', response)
+    return responce
+
 
 if __name__=='__main__':
-    args = arguments()
-    client = open_aws_entity(args)
-    list_metrics(args, client)
-    get_statistics(args, client)
+    args = get_parser().parse_args()
+
+    res = download_metric(args.region, args.namespace, args.metric, args.timestart, args.timeend)
+    pprint(res)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Test with
-# ./list-log-groups-streams.py
+# ./list-log-stream.py
 #
 import boto3
 from botocore.config import Config

@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
+#
+# Test with
+# ./cli-choose-logs.py -o tmp
+#
+import boto3
+from pprint import pprint
+
 import importlib
 
-list_log_streams = importlib.import_module("list-log-groups-streams")
+list_log_streams = importlib.import_module("list-log-stream")
 download_log_stream = importlib.import_module("download-log-stream")
 
 # list_s3_buckets
@@ -10,44 +17,18 @@ download_log_stream = importlib.import_module("download-log-stream")
 # list_cloudwatch_metrics
 # download-cloudwatch.py
 
-from pprint import pprint
-from botocore.config import Config
-import argparse
-from datetime import datetime
-import boto3
+lib_utils = importlib.import_module("lib-utils")
 
 
-def arguments():
-    parser = argparse.ArgumentParser(description='''
-    Download selected Log Streams with correct time range.
-    Credentials are read from ~/.aws/config or
-    see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
-    ''')
+def get_parser():
+    helptext="Download selected Log Streams with correct time range."
+    args = [
+        "outdir"
+        , "timestart"
+        , "timeend"
+    ]
+    return lib_utils.get_parser(helptext, args)
 
-    parser.add_argument('-o', '--outdir', type=str, default="./",
-        help='Path to output directory, by default current directory'
-    )
-    parser.add_argument('-s', '--timestart', type=datetime.fromisoformat, default=datetime.fromisoformat("3000-01-01T00:00:00"),
-        help='Start time for events in iso format e.g. 2020-07-14T00:33:24'
-    )
-    parser.add_argument('-e', '--timeend', type=datetime.fromisoformat, default=datetime.fromisoformat("2000-01-01T00:00:00"),
-        help='End time for events in iso format e.g. 2020-07-14T00:33:24'
-    )
-
-    return parser.parse_args()
-
-
-def read_index(min_val, max_val):
-    while True:
-        try:
-            i = int(input("Enter index of stream to download or Ctrl-C to quit:"))
-            if min_val <= i and i <= max_val:
-                return i
-            else:
-                print("Index must be in range {} to {}".format(min_val, max_val))
-        except Exception as e:
-            print(e)
-            print("Error, please try again")
 
 
 def get_possible_download_items():
@@ -66,17 +47,19 @@ def interactively_download(args, items):
     for item in items:
         print("{:2} {:3} {:20} {:60} {}".format(*item))
 
-    i = read_index(0, len(items)-1)
+    i = lib_utils.read_integer("Enter index of stream to download or 'exit' to quit: ", 0, len(items)-1)
+    if i < 0:
+        return -1
 
     _, _, cur_reg, cur_group, cur_stream = items[i]
 
     # perform the download
-    download_client = boto3.client('logs', region_name=cur_reg)
-    download_log_stream.download_log_stream(args.outdir, download_client, cur_group, cur_stream, args.timestart, args.timeend)
+    download_log_stream.download_log_stream_to_file(cur_reg, cur_group, cur_stream, args.timestart, args.timeend, args.outdir)
 
     # change status
     items[i][0] = "+"
     print("Download done.")
+    return 0
 
 
 def test_interactive_download():
@@ -94,9 +77,11 @@ def test_interactive_download():
 
 if __name__ == "__main__":
     # test_interactive_download()
-    args = arguments()
+    args = get_parser().parse_args()
 
     items = get_possible_download_items()
 
-    while True:
-        interactively_download(args, items)
+    while interactively_download(args, items) != -1:
+        continue
+
+    print("Exit")
