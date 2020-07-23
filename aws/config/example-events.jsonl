@@ -1,0 +1,3 @@
+{"message": "A message","timestamp": 123456789,"datetime": "2015-07-24T19:01:01","timestamp_desc": "Write time","extra_field_1": "foo"}
+{"message": "Another message","timestamp": 123456790,"datetime": "2015-07-24T19:01:02","timestamp_desc": "Write time","extra_field_1": "bar"}
+{"message": "Yet more messages","timestamp": 123456791,"datetime": "2015-07-24T19:01:03","timestamp_desc": "Write time","extra_field_1": "baz"}

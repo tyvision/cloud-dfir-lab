@@ -142,3 +142,143 @@ Playbook is made to run against infrastructure created by terraform.
 ```
 # ls -la ./output/
 ```
+
+
+
+## Getting started with Timesketch:
+
+Clone, use the e2e directory. Its for end-to-end testing and does not have debug flags. Add kibana crate:
+
+
+  kibana:
+    image: kibana:7.6.2
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOST: http://elasticsearch:9200
+
+Set timesketch USER and PASSWORD to admin:admin.
+
+Run compose. 
+
+
+For kibana: localhost:5601
+For timesketch: localhost:80
+
+For postgres docker attach to container. Then "psql --username=timesketch --password=password".
+See databases: \list
+See tables: \dt
+
+Try importing test events: aws/config/example-events.jsonl
+For some readon web interface does not work.
+
+Using command line works:
+
+Docker cp example-events.jsonl into `e2e_timesketch_1` container.
+
+```
+# docker cp example-events.jsonl e2e_timesketch_1:/
+# docker exec -it e2e_timesketch_1 /bin/bash
+```
+
+Attach to docker container.
+Use tsctl to import.
+```
+# tsctl list_sketches
+# tsctl import --sketch_id 1 --file example-events.jsonl --timeline_name test1 --user admin
+
+```
+
+
+To view data in Kibana create index pattern and get all messages.
+Also can go to dev tools and execute queries directly agains elastic database.
+
+
+To View all documents for all indices (note parameter size=200, because by default size is 10):
+
+```
+GET /_all/_search?size=200
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+Also list all indices:
+```
+GET _cat/indices?v
+```
+
+To get data about the contents of DB use GET index:
+```
+Get 6ae91f0374634aa9a06186e9110d6989
+```
+
+
+How example data is stored in Elastic:
+
+```
+   {
+        "_index": "6ae91f0374634aa9a06186e9110d6989",
+        "_type": "_doc",
+        "_id": "K0WOfHMB12F-ZfcnOtiQ",
+        "_version": 1,
+        "_score": 0,
+        "_source": {
+          "message": "A message",
+          "timestamp": 123456789,
+          "datetime": "2015-07-24T19:01:01",
+          "timestamp_desc": "Write time",
+          "extra_field_1": "foo"
+        },
+        "fields": {
+          "datetime": [
+            "2015-07-24T19:01:01.000Z"
+          ]
+        }
+      },
+      {
+        "_index": "6ae91f0374634aa9a06186e9110d6989",
+        "_type": "_doc",
+        "_id": "LEWOfHMB12F-ZfcnOtiQ",
+        "_version": 1,
+        "_score": 0,
+        "_source": {
+          "message": "Another message",
+          "timestamp": 123456790,
+          "datetime": "2015-07-24T19:01:02",
+          "timestamp_desc": "Write time",
+          "extra_field_1": "bar"
+        },
+        "fields": {
+          "datetime": [
+            "2015-07-24T19:01:02.000Z"
+          ]
+        }
+      },
+      {
+        "_index": "6ae91f0374634aa9a06186e9110d6989",
+        "_type": "_doc",
+        "_id": "LUWOfHMB12F-ZfcnOtiQ",
+        "_version": 1,
+        "_score": 0,
+        "_source": {
+          "message": "Yet more messages",
+          "timestamp": 123456791,
+          "datetime": "2015-07-24T19:01:03",
+          "timestamp_desc": "Write time",
+          "extra_field_1": "baz"
+        },
+        "fields": {
+          "datetime": [
+            "2015-07-24T19:01:03.000Z"
+          ]
+        }
+      }
+
+```
+
+
+To l
