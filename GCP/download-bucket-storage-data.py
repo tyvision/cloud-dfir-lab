@@ -36,4 +36,4 @@ elif value == "2":
     valya1 = input()
     down(valya1)
 else:
-    print("vasya pidr")
+    print("nothing to work with")
