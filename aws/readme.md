@@ -149,24 +149,24 @@ Playbook is made to run against infrastructure created by terraform.
 
 Clone, use the e2e directory. Its for end-to-end testing and does not have debug flags. Add kibana crate:
 
-
-  kibana:
+```
+kibana:
     image: kibana:7.6.2
     ports:
-      - "5601:5601"
-    environment:
+	  - "5601:5601"
+  	environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_HOST: http://elasticsearch:9200
+```
 
-Set timesketch USER and PASSWORD to admin:admin.
+ Set timesketch USER and PASSWORD to admin:admin.
 
 Run compose. 
-
 
 For kibana: localhost:5601
 For timesketch: localhost:80
 
-For postgres docker attach to container. Then "psql --username=timesketch --password=password".
+For postgres: docker attach to container. Then "psql --username=timesketch --password=password".
 See databases: \list
 See tables: \dt
 
@@ -175,24 +175,23 @@ For some readon web interface does not work.
 
 Using command line works:
 
-Docker cp example-events.jsonl into `e2e_timesketch_1` container.
+Docker cp example-events.jsonl into `e2e_timesketch_1` container. Then attach to that container.
 
 ```
 # docker cp example-events.jsonl e2e_timesketch_1:/
 # docker exec -it e2e_timesketch_1 /bin/bash
 ```
 
-Attach to docker container.
 Use tsctl to import.
+
 ```
 # tsctl list_sketches
 # tsctl import --sketch_id 1 --file example-events.jsonl --timeline_name test1 --user admin
 
 ```
 
-
 To view data in Kibana create index pattern and get all messages.
-Also can go to dev tools and execute queries directly agains elastic database.
+Also can go to dev tools and execute queries directly against elastic database.
 
 
 To View all documents for all indices (note parameter size=200, because by default size is 10):
@@ -209,76 +208,64 @@ GET /_all/_search?size=200
 Also list all indices:
 ```
 GET _cat/indices?v
-```
-
-To get data about the contents of DB use GET index:
-```
-Get 6ae91f0374634aa9a06186e9110d6989
-```
-
-
-How example data is stored in Elastic:
 
 ```
-   {
-        "_index": "6ae91f0374634aa9a06186e9110d6989",
-        "_type": "_doc",
-        "_id": "K0WOfHMB12F-ZfcnOtiQ",
-        "_version": 1,
-        "_score": 0,
-        "_source": {
-          "message": "A message",
-          "timestamp": 123456789,
-          "datetime": "2015-07-24T19:01:01",
-          "timestamp_desc": "Write time",
-          "extra_field_1": "foo"
-        },
-        "fields": {
-          "datetime": [
-            "2015-07-24T19:01:01.000Z"
-          ]
+
+To get all documents from particular index "myindexname":
+```
+GET /myindexname/_search?size=200
+{
+    "query" : {
+        "match_all" : {}
+    }
+}
+```
+
+
+Below is how data gets stored when imported with "tsctl import" cli tool from index 6ae91f0374634aa9a06186e9110d6989:
+
+```
+      {
+        "_index" : "6ae91f0374634aa9a06186e9110d6989",
+        "_type" : "_doc",
+        "_id" : "K0WOfHMB12F-ZfcnOtiQ",
+        "_score" : 1.0,
+        "_source" : {
+          "message" : "A message",
+          "timestamp" : 123456789,
+          "datetime" : "2015-07-24T19:01:01",
+          "timestamp_desc" : "Write time",
+          "extra_field_1" : "foo"
         }
       },
       {
-        "_index": "6ae91f0374634aa9a06186e9110d6989",
-        "_type": "_doc",
-        "_id": "LEWOfHMB12F-ZfcnOtiQ",
-        "_version": 1,
-        "_score": 0,
-        "_source": {
-          "message": "Another message",
-          "timestamp": 123456790,
-          "datetime": "2015-07-24T19:01:02",
-          "timestamp_desc": "Write time",
-          "extra_field_1": "bar"
-        },
-        "fields": {
-          "datetime": [
-            "2015-07-24T19:01:02.000Z"
-          ]
+        "_index" : "6ae91f0374634aa9a06186e9110d6989",
+        "_type" : "_doc",
+        "_id" : "LEWOfHMB12F-ZfcnOtiQ",
+        "_score" : 1.0,
+        "_source" : {
+          "message" : "Another message",
+          "timestamp" : 123456790,
+          "datetime" : "2015-07-24T19:01:02",
+          "timestamp_desc" : "Write time",
+          "extra_field_1" : "bar"
         }
       },
       {
-        "_index": "6ae91f0374634aa9a06186e9110d6989",
-        "_type": "_doc",
-        "_id": "LUWOfHMB12F-ZfcnOtiQ",
-        "_version": 1,
-        "_score": 0,
-        "_source": {
-          "message": "Yet more messages",
-          "timestamp": 123456791,
-          "datetime": "2015-07-24T19:01:03",
-          "timestamp_desc": "Write time",
-          "extra_field_1": "baz"
-        },
-        "fields": {
-          "datetime": [
-            "2015-07-24T19:01:03.000Z"
-          ]
+        "_index" : "6ae91f0374634aa9a06186e9110d6989",
+        "_type" : "_doc",
+        "_id" : "LUWOfHMB12F-ZfcnOtiQ",
+        "_score" : 1.0,
+        "_source" : {
+          "message" : "Yet more messages",
+          "timestamp" : 123456791,
+          "datetime" : "2015-07-24T19:01:03",
+          "timestamp_desc" : "Write time",
+          "extra_field_1" : "baz"
         }
       }
-
 ```
+
 
 
 ## Getting started with Logstsah
@@ -286,12 +273,13 @@ How example data is stored in Elastic:
 After timesketch stack is up and running the next step is to load data.
 
 Get logstash docker container that is the same version as elxasticsearch used in timesketch - 7.6.2
+Also attach to the same docker network where timesketch is running.
 
 ```
 # docker pull logstash:7.6.2
 # cd aws
 # mkdir output
-# docker run -it --mount type=bind,src=$(pwd)/config/,dst=/conf --mount type=bind,src=$(pwd)/output,dst=/input logstash:7.6.2 /bin/bash
+# docker run -it --network e2e_default --mount type=bind,src=$(pwd)/config/,dst=/conf --mount type=bind,src=$(pwd)/output,dst=/input logstash:7.6.2 /bin/bash
 ```
 
 For debug run bash and start logstash manually, you should see it parse the logs.
@@ -302,9 +290,8 @@ For debug run bash and start logstash manually, you should see it parse the logs
 After every run logstash saves data bout progress wih respect to file into a sincedb file.
 This causes problems during development, because it does not re-read old logs. See https://stackoverflow.com/questions/32742379/logstash-file-input-glob-not-working
 
-Best solution is to remove old sincedb files and set [input][file] option [start_position] = beginning to
-tell logstash that is must re-parse log files fully each time. Optionally set [input][file][sincedb_path] => "/dev/null"
-this will stop writing new sincedb files, but you still need to delete old ones, because they are still read on startup.
+Best solution is to remove old sincedb files and set `[input][file][start_position] = beginning` to
+tell logstash that is must re-parse log files fully each time. Optionally set `[input][file][sincedb_path] => "/dev/null"` this will stop writing new sincedb files, but you still need to delete old ones, because they are still read on startup.
 
 To delete old sincedb files use the below to find them:
 ```
@@ -321,5 +308,100 @@ To add new events and see how they work use:
 # cat config/example-events-logstash-1.jsonl >> output/file_2.jsonl
 ```
 
-Outout should be on stdout.
+Output will be on stdout.
 Note json_lines plugin for file does NOT work, but json plugin works.
+
+Here is how data imported with logstash looks (compare with that imported by tsctl) from index `logstash-2020.07.24-000001`:
+
+```
+      {
+        "_index" : "logstash-2020.07.24-000001",
+        "_type" : "_doc",
+        "_id" : "Q7RHgXMBzy7j0CFDpY-O",
+        "_score" : 1.0,
+        "_source" : {
+          "@timestamp" : "2020-07-24T14:43:42.789Z",
+          "extra_field_1" : "bar",
+          "host" : "9f4af4e57c19",
+          "message" : "Another message Logstash try1",
+          "datetime" : "2015-07-24T19:01:02",
+          "timestamp" : 123456790,
+          "timestamp_desc" : "Write time",
+          "@version" : "1",
+          "path" : "/input/file_1.jsonl"
+        }
+      },
+      {
+        "_index" : "logstash-2020.07.24-000001",
+        "_type" : "_doc",
+        "_id" : "QrRHgXMBzy7j0CFDpY-N",
+        "_score" : 1.0,
+        "_source" : {
+          "@timestamp" : "2020-07-24T14:43:42.757Z",
+          "extra_field_1" : "foo",
+          "host" : "9f4af4e57c19",
+          "message" : "A message Logstash try1",
+          "datetime" : "2015-07-24T19:01:01",
+          "timestamp" : 123456789,
+          "timestamp_desc" : "Write time",
+          "@version" : "1",
+          "path" : "/input/file_1.jsonl"
+        }
+      },
+      {
+        "_index" : "logstash-2020.07.24-000001",
+        "_type" : "_doc",
+        "_id" : "QbRHgXMBzy7j0CFDpY-N",
+        "_score" : 1.0,
+        "_source" : {
+          "@timestamp" : "2020-07-24T14:43:42.790Z",
+          "extra_field_1" : "baz",
+          "host" : "9f4af4e57c19",
+          "message" : "Yet more messages Logstash try1",
+          "datetime" : "2015-07-24T19:01:03",
+          "timestamp" : 123456791,
+          "timestamp_desc" : "Write time",
+          "@version" : "1",
+          "path" : "/input/file_1.jsonl"
+        }
+      }
+```
+
+
+
+## Problem with Logstash + Timesketch
+
+In Timesketch a sketch is made up of timelines. Each timeline is stored in a separate index in the Elasticsearch database. The events of the timeline each become a document in the index. So a timeline with 3 events results in a new index with 3 documents.
+
+Below I imported two timelines into timesketch, one uses index 6ae91f0374634aa9a06186e9110d6989 in elasticsearch database and another uses index 86ed7402923a428eb415649222e69694.
+
+When importing a timeline in timesketch, we can see the index name created in postgres in table searchindex.
+
+```
+timesketch=# select * from searchindex;
+ id |         created_at         |         updated_at         |       name       |   description    |            index_name            | user_id
+----+----------------------------+----------------------------+------------------+------------------+----------------------------------+---------
+  1 | 2020-07-23 16:42:41.040877 | 2020-07-23 16:42:41.040877 | test1            | test1            | 6ae91f0374634aa9a06186e9110d6989 |       1
+  2 | 2020-07-24 14:56:20.811376 | 2020-07-24 14:56:20.811376 | example-events-2 | example-events-2 | 86ed7402923a428eb415649222e69694 |       1
+(2 rows)
+
+```
+
+The extract from elastic database showing all the indices:
+```
+health status index                            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   6ae91f0374634aa9a06186e9110d6989 nvET5RTcT_S9wNPVAv8oUw   1   1          3            0      5.6kb          5.6kb
+green  open   .kibana_task_manager_1           BibfRLY2QomU4bqy_7O74g   1   0          2            2     20.4kb         20.4kb
+yellow open   86ed7402923a428eb415649222e69694 YvXcYeuoRiChCGU1Q-jV1Q   1   1          3            0      5.6kb          5.6kb
+green  open   ilm-history-1-000001             po6qdqTiQbCblI85NZTbzA   1   0         18            0     25.6kb         25.6kb
+green  open   .apm-agent-configuration         J3IqgvGsSSiQK53jiXxHjg   1   0          0            0       283b           283b
+yellow open   logstash-2020.07.24-000001       PF8Iwb_pS9iwA3DvF5Ze4Q   1   1          3            0     13.4kb         13.4kb
+green  open   .kibana_1                        axp3KbomQCSZtNl-0d2QVw   1   0         11            0     86.2kb         86.2kb
+```
+
+The same index names 86ed7402923a428eb415649222e69694 and 6ae91f0374634aa9a06186e9110d6989 are found here.
+Also note the index name logstash-2020.07.24-000001 which was created automatically by logstash, when importing.
+
+So while its possible to insert data into db with logstash, to make it work with Timeksketch we need to also insert meta-data into the Postgres DB. Otherwise timesketch will not know how to use the data. On the other hand we can modify Logstash config to specify explicitly the index where data should be placed, however for that we still need to get access to postgres DB because the index names are randomly generated and not visible in Timesketch interface.
+
+Both of the above are poor solutions to implement.
