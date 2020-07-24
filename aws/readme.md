@@ -281,4 +281,45 @@ How example data is stored in Elastic:
 ```
 
 
-To l
+## Getting started with Logstsah
+
+After timesketch stack is up and running the next step is to load data.
+
+Get logstash docker container that is the same version as elxasticsearch used in timesketch - 7.6.2
+
+```
+# docker pull logstash:7.6.2
+# cd aws
+# mkdir output
+# docker run -it --mount type=bind,src=$(pwd)/config/,dst=/conf --mount type=bind,src=$(pwd)/output,dst=/input logstash:7.6.2 /bin/bash
+```
+
+For debug run bash and start logstash manually, you should see it parse the logs.
+```
+# logstash --verbose -f /conf/logstash-simple.conf
+```
+
+After every run logstash saves data bout progress wih respect to file into a sincedb file.
+This causes problems during development, because it does not re-read old logs. See https://stackoverflow.com/questions/32742379/logstash-file-input-glob-not-working
+
+Best solution is to remove old sincedb files and set [input][file] option [start_position] = beginning to
+tell logstash that is must re-parse log files fully each time. Optionally set [input][file][sincedb_path] => "/dev/null"
+this will stop writing new sincedb files, but you still need to delete old ones, because they are still read on startup.
+
+To delete old sincedb files use the below to find them:
+```
+cd /
+find . | grep sincedb
+```
+
+They are actually part of the file plugin.
+
+
+To add new events and see how they work use:
+```
+# cd aws
+# cat config/example-events-logstash-1.jsonl >> output/file_2.jsonl
+```
+
+Outout should be on stdout.
+Note json_lines plugin for file does NOT work, but json plugin works.
