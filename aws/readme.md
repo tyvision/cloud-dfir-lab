@@ -16,8 +16,6 @@ Every python script has example command line of how to run it in the file header
 
 Every python script has a  `--help` argument.
 
-
-
 0) Clone the repository
 
 ```
@@ -86,11 +84,11 @@ Terraform state is stored remotely in S3 bucket, see `terraform` directive in .t
 
 ## Getting started with Ansible
 
-Playbook is made to run against infrastructure created by terraform. 
+Playbook is made to run against infrastructure created by terraform.
 
 0) Check inventory.yml to make sure the correct SSH key and user are set for the instances.
 
-1) Check that ansible inventory
+1) Verify ansible inventory
 
 ```
 # cd ansible/
@@ -106,6 +104,27 @@ Playbook is made to run against infrastructure created by terraform.
 
 
 
+**Developing Ansible scripts**
+
+Its best to test them against a VM. Use vagrant to get Ubuntu 18.04:
+
+```
+# mkdir vm1
+# cd vm1
+# vagrant init hashicorp/bionic64
+# vagrant up
+```
+
+Edit Vagrant file to allow ports and set memory limits.
+Initial connection must be done vagrant ssh, then possible to use plain ssh.
+```
+# cd vm1
+# vagrant ssh
+# ssh -i .vagrant/machines/default/virtualbox/private_key vagrant@127.0.0.1 -p 2222
+```
+
+
+
 ## Getting started with Docker:
 
 0) Clone the repository
@@ -113,11 +132,11 @@ Playbook is made to run against infrastructure created by terraform.
 # git clone https://github.com/tyvision/cloud-dfir-lab
 # cd cloud-dfir-lab/aws
 ```
-1) Setup aws-credentials.env file by copying and editing config/example-aws-credentials.env
+1) Setup credentials file by copying and editing config/example-docker-credentials.env
 
 ```
-# cp config/example-aws-credentials.env aws-credentials.env
-# vim aws-credentials.env
+# cp config/example-docker-credentials.env docker-credentials.env
+# vim docker-credentials.env
 ```
 2) Build docker image
 
@@ -134,7 +153,7 @@ Playbook is made to run against infrastructure created by terraform.
 4) Run docker
 
 ```
-# docker run -it --env-file=aws-credentials.env --mount type=bind,src=$(pwd)/output,dst=/output temach/cloud-1
+# docker run -it --env-file=docker-credentials.env --mount type=bind,src=$(pwd)/output,dst=/output temach/cloud-1
 ```
 
 5) View log files
@@ -142,6 +161,118 @@ Playbook is made to run against infrastructure created by terraform.
 ```
 # ls -la ./output/
 ```
+
+
+
+## Getting started with docker-compose
+
+0) Clone the repository
+
+```
+# git clone https://github.com/tyvision/cloud-dfir-lab
+# cd cloud-dfir-lab/aws
+```
+
+1) Setup environment variables.
+
+You can either directly export them into your shell:
+
+```
+export AWS_ACCESS_KEY_ID=XXX
+export AWS_SECRET_ACCESS_KEY=XXX
+```
+
+Or you can source them from file:
+
+```
+# cp config/example-aws-credentials.sh aws-credentials.sh
+# vim aws-credentials.sh
+# source aws-credentials.sh
+```
+
+2) Run docker-compose
+
+```
+# cd docker/
+# docker-compose up
+```
+
+3) Access logcollector to collect logs from cloud.
+
+4) Aceess Timesketch to view events from collected logs on `http://localhost:80`
+
+
+
+**Security issue**
+
+The services in docker-compose bind to  0.0.0.0, that is they listen on all interfaces. This is a security problem, because the services (timesketch,  elasticsearch, postgres, etc) are exposed to the internet. And timesketch does not even use HTTPS.
+
+Protect the services by preventing public access to them (to their ports). They should be accessible only via localhost on the laboratory machine. 
+
+
+
+**Remote access to secured services**
+If the laboratory machine is running in the cloud, it will have SSH access. Therefore two simple ways to access the services:
+
+**HTTP over SSH**
+Investigator can use HTTP over SSH to access the services. See: https://ma.ttias.be/socks-proxy-linux-ssh-bypass-content-filters/
+The SSH tunnel is created on the investigator's client machine:
+
+```
+ssh -i private_key -D 8080 -q -C -N vagrant@127.0.0.1 -p 2222
+```
+
+**X over SSH**
+Install Xorg-server and a web browser into the laboratory machine. Forward X over SSH:
+
+```
+ssh -X -i private_key vagrant@127.0.0.1 -p 2222
+```
+
+
+
+**Securing services from public access**
+
+Unfortunatelly docker can not be restricted to an interface. The default interface can be set, but it is not restrictive. See: https://docs.docker.com/network/iptables/#setting-the-default-bind-address-for-containers
+
+There are three options, the iptable option is currently implemented.
+
+**Option 1: Using iptables rules**
+Use the iptable rules to make the laboratory machine drop new connections if they are not SSH. This rule can be added to INPUT chain or DOCKER-USER chain. Better to add the rule to specific WAN interface e.g. `eth0` so it will not disturb system interfaces e.g. `loopback`, `docker0`. As a result, although the service listens on 0.0.0.0 no new connection can be established with it. 
+
+**Option 2: Using special ports notation**
+Special notation for ports: https://docs.docker.com/compose/compose-file/#ports
+See also: https://stackoverflow.com/questions/56053824/how-to-restrict-that-a-docker-container-only-listens-connection-from-localhost
+
+```
+ports:
+  - "127.0.0.1:8001:8001"
+```
+
+However this does not work. The outside connections are still accepted: 
+
+```
+# sudo netstat -lntp | head
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:80            0.0.0.0:*               LISTEN      16505/docker-proxy
+tcp        0      0 127.0.0.1:9200          0.0.0.0:*               LISTEN      15271/docker-proxy
+tcp        0      0 127.0.0.1:9300          0.0.0.0:*               LISTEN      15259/docker-proxy
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      540/sshd: /usr/bin/
+```
+
+**Option 3: Use docker internal network**
+Set up an internal network: https://docs.docker.com/compose/compose-file/#internal
+The default network is the one that gets created looking like: `[projectname]_default`
+See https://docs.docker.com/compose/networking/#configure-the-default-network
+
+```
+networks:
+  default:
+    internal: true
+```
+
+However this does not work as default network is not accessiable even to localhost.
 
 
 
@@ -159,7 +290,7 @@ kibana:
       ELASTICSEARCH_HOST: http://elasticsearch:9200
 ```
 
- Set timesketch USER and PASSWORD to admin:admin.
+Set timesketch USER and PASSWORD to admin:admin.
 
 Run compose. 
 
@@ -405,3 +536,6 @@ Also note the index name logstash-2020.07.24-000001 which was created automatica
 So while its possible to insert data into db with logstash, to make it work with Timeksketch we need to also insert meta-data into the Postgres DB. Otherwise timesketch will not know how to use the data. On the other hand we can modify Logstash config to specify explicitly the index where data should be placed, however for that we still need to get access to postgres DB because the index names are randomly generated and not visible in Timesketch interface.
 
 Both of the above are poor solutions to implement.
+
+
+
