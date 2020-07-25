@@ -1,7 +1,8 @@
 venv
 .idea
-aws-credentials.env
+aws-credentials.sh
 docker-credentials.env
 .terraform
 *.tfstate
 *.tfstate.backup
+*.retry
