@@ -1,0 +1,71 @@
+version: '3'
+services:
+  logcollector:
+    image: temach/cloud-dfir-logcollector
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+    ports:
+      - "22222:22"
+    depends_on:
+      - timesketch
+    restart: always
+
+  timesketch:
+    image: temach/cloud-dfir-timesketch
+    environment:
+      - POSTGRES_USER=timesketch
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_ADDRESS=postgres
+      - POSTGRES_PORT=5432
+      - ELASTIC_ADDRESS=elasticsearch
+      - ELASTIC_PORT=9200
+      - REDIS_ADDRESS=redis
+      - REDIS_PORT=6379
+      - TIMESKETCH_USER=admin
+      - TIMESKETCH_PASSWORD=admin
+    ports:
+      - "80:80"
+    depends_on:
+      - elasticsearch
+      - postgres
+      - redis
+      - kibana
+    restart: always
+
+  elasticsearch:
+    environment:
+      - TAKE_FILE_OWNERSHIP=1
+      - discovery.type=single-node
+    # uncomment the following lines to control JVM memory utilization
+    # in smaller deployments with minimal resources
+    #  - ES_JAVA_OPTS= -Xms1g -Xmx1g # 1G min/1G max
+    image: elasticsearch:7.6.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: always
+
+  kibana:
+    image: kibana:7.6.2
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOST: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: always
+
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=timesketch
+      - POSTGRES_PASSWORD=password
+    restart: always
+
+  redis:
+    image: redis
+    restart: always
