@@ -4,20 +4,18 @@
 # ./list-log-stream.py
 #
 import boto3
-from botocore.config import Config
-import argparse
-from datetime import datetime
 from pprint import pprint
 
-def arguments():
-    parser = argparse.ArgumentParser(description='''
-    Show the hierarchy Regions -> LogGroups -> LogStreams
-    This script does not take any arguments.
-    Credentials are read from ~/.aws/config or
-    see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
-    ''')
+import importlib
+lib_utils = importlib.import_module("lib-utils")
 
-    return None
+def get_parser():
+    helptext="""
+Show the hierarchy Regions -> LogGroups -> LogStreams
+This script does not need any arguments.
+"""
+    args = []
+    return lib_utils.get_parser(helptext, args)
 
 def list_regions():
     # this must be 'ec2'
@@ -56,7 +54,7 @@ def list_hierarchy():
     return res
 
 if __name__=="__main__":
-    args = arguments()
+    args = get_parser().parse_args()
     res = list_hierarchy()
     pprint(res)
 

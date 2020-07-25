@@ -8,15 +8,15 @@ from datetime import datetime
 import json
 import os
 import re
+from pathlib import Path
 
 def get_parser(helptext, params):
-    fulltext = """
-    {}
+    fulltext = """{}
 
-    Configure credentials see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+Configure credentials see https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
     """.format(helptext)
 
-    parser = argparse.ArgumentParser( description=fulltext )
+    parser = argparse.ArgumentParser( description=fulltext , formatter_class=argparse.RawDescriptionHelpFormatter )
 
     # other
     if "region" in params:
@@ -55,6 +55,17 @@ def get_parser(helptext, params):
     if "metric" in params:
         parser.add_argument('metric', type=str,
             help='Name of the metric e.g. "NetworkOut" or https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html'
+        )
+
+    # for JSON clean up scripts
+    if "inputfile" in params:
+        parser.add_argument('inputfile', type=Path,
+            help='Path to input file'
+        )
+
+    if "outputfile" in params:
+        parser.add_argument('outputfile', type=Path,
+            help='Path to output file'
         )
 
     # other
@@ -116,7 +127,7 @@ def read_integer(prompt, min_val, max_val):
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
+    args = get_parser("Example parser", []).parse_args()
 
     print(args.log_group)
     print(args.log_stream)
@@ -124,3 +135,5 @@ if __name__ == "__main__":
     print(args.outdir)
     print(args.timestart.isoformat())
     print(args.timeend.isoformat())
+    print(args.inputfile)
+    print(args.outputfile)
