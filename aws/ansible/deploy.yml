@@ -20,6 +20,9 @@
         update_cache: yes
         pkg:
           - python3-pip
+          - docker.io
+          - docker-compose
+          - iptables-persistent
 
     - name: Create project directory
       file:
@@ -45,26 +48,40 @@
         insertafter: EOF
         line: "source {{ v_proj }}/{{ v_aws_env}}"
 
-    - name: Copy code dependencies config
+    - name: Copy docker-compose configuration
       copy:
-        src: "{{ playbook_dir }}/../config/requirements.txt"
+        src: "{{ playbook_dir }}/../docker/docker-compose.yml"
         dest: "{{ v_proj }}/"
 
-    - name: Install code dependencies
-      pip:
-        state: latest
-        requirements: "{{ v_proj }}/requirements.txt"
+    # to flush iptables rules "iptables -F"
+    # to view iptables rules "iptables -S DOCKER-USER"
+    # for allow only ssh, see https://www.cyberciti.biz/tips/linux-iptables-4-block-all-incoming-traffic-but-allow-ssh.html
+    # also note: https://docs.docker.com/network/iptables/#setting-the-default-bind-address-for-containers
+    - name: Drop incoming connections if they are not SSH
+      become: yes
+      iptables:
+        action: append
+        chain: INPUT
+        in_interface: eth0
+        protocol: tcp
+        ctstate: NEW
+        destination_port: "!22"
+        jump: DROP
 
-    - name: Copy code
-      copy:
-        src: "{{ playbook_dir }}/../code/"
-        dest: "{{ v_proj }}/code"
-        mode: '700'
+    - name: Save iptables rules
+      become: yes
+      shell: "iptables-save > /etc/iptables/rules.v4"
+      changed_when: false
 
-    - name: "Set credentials manually post-install"
+    - name: "Please, set credentials manually post-install"
       debug:
         msg:
-          - "To complete this deployment manually set the environment variables"
+          - "To complete this deployment, manually set the environment variables"
           - "AWS_ACCESS_KEY_ID=XXX"
           - "AWS_SECRET_ACCESS_KEY=XXX"
           - "You can set them in {{ v_proj }}/{{ v_aws_env }} file, it will be sourced from ~/.bashrc automatically."
+
+    - name: "Please, manually run docker-compose to finish installation"
+      debug:
+        msg:
+          - "To complete this deployment, manually run 'docker-compose up' in {{ v_proj }}/ directory"
