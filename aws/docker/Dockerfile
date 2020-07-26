@@ -2,15 +2,12 @@
 # docker build -t name/tag -f docker/Dockerfile .
 #
 # Test with
-# docker run -it --env-file docker-credentials.env --mount type=bind,src=$(pwd)/output,dst=/output name/tag /bin/sh
+# docker run -it --env-file docker-credentials.env name/tag
 #
-FROM alpine:latest
+FROM debian:latest
 
-# the code expects environment variables via --env-file
-ENV AWS_ACCESS_KEY_ID=XXX
-ENV AWS_SECRET_ACCESS_KEY=XXX
-
-RUN apk add --no-cache python3
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip
 
 WORKDIR /root/cloud-dfir
 
@@ -19,6 +16,10 @@ RUN pip3 install -r requirements.txt
 
 COPY ./code/*.py ./
 
-# to extract downloaded log files mount to local ./output directory via --mount
-CMD ["./cli-choose-logs.py", "-o", "/output"]
+# the code expects environment variables
+ENV AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY
+
+CMD ["sleep", "infinity"]
+# CMD ["./frontend-cli.py"]
 # CMD ["/bin/sh"]
