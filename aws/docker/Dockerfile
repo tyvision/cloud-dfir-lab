@@ -14,7 +14,7 @@ WORKDIR /root/cloud-dfir
 COPY ./config/requirements.txt ./
 RUN pip3 install -r requirements.txt
 
-COPY ./code/*.py ./
+COPY ./logcollector/*.py ./
 
 # the code expects environment variables
 ENV AWS_ACCESS_KEY_ID

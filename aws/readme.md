@@ -10,7 +10,7 @@
 
 
 
-## Getting started with code
+## Getting started with logcollector code
 
 Every python script has example command line of how to run it in the file header.
 
@@ -35,7 +35,7 @@ Every python script has a  `--help` argument.
 
 ```
 # pip install -r config/requirements.txt
-# python code/cli-choose-logs.py --help
+# python logcollector/cli-choose-logs.py --help
 ```
 
 

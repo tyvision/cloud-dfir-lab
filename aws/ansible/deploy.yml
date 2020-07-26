@@ -71,15 +71,15 @@
 
     # Must copy code, so a docker container can be build on the laboratory machine
     # Can not push pre-build container to registry, because code inside container must be private
-    - name: Copy code dependencies config
+    - name: Copy logcollector dependencies config
       copy:
         src: "{{ playbook_dir }}/../config/requirements.txt"
         dest: "{{ v_proj }}/config/"
 
-    - name: Copy code
+    - name: Copy logcollector
       copy:
-        src: "{{ playbook_dir }}/../code/"
-        dest: "{{ v_proj }}/code/"
+        src: "{{ playbook_dir }}/../logcollector/"
+        dest: "{{ v_proj }}/logcollector/"
         mode: '700'
 
     # to flush iptables rules "iptables -F"
