@@ -30,7 +30,6 @@ def get_parser():
     return lib_utils.get_parser(helptext, args)
 
 
-
 def get_possible_download_items():
     res = list_log_streams.list_hierarchy()
     count = 0
@@ -42,13 +41,24 @@ def get_possible_download_items():
                 count += 1
     return valid
 
+def interactively_get_index(items):
+    for item in items:
+        print("{:2} {:3} {:20} {:60} {}".format(*item))
 
-def interactively_download(args, items):
+    i = lib_utils.read_integer("Enter index of stream to download or 'q' to quit menu: ", 0, len(items)-1)
+    if not i:
+        return None
+
+    # change status
+    items[i][0] = "+"
+    return i
+
+def interactively_download_to_file(args, items):
     for item in items:
         print("{:2} {:3} {:20} {:60} {}".format(*item))
 
     i = lib_utils.read_integer("Enter index of stream to download or 'exit' to quit: ", 0, len(items)-1)
-    if i < 0:
+    if not i:
         return -1
 
     _, _, cur_reg, cur_group, cur_stream = items[i]
@@ -81,7 +91,7 @@ if __name__ == "__main__":
 
     items = get_possible_download_items()
 
-    while interactively_download(args, items) != -1:
+    while interactively_download_to_file(args, items) != -1:
         continue
 
     print("Exit")

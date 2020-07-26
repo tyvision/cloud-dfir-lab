@@ -43,7 +43,7 @@ def recreate_dir(path):
 def find_cleanup_plugin(target_info, raw_path):
     return cleanup_plugins.get( target_info["cleanup-plugin"] )
 
-def transfer_events(targets, timestart, timeend):
+def transfer_events(targets, timestart, timeend, timesketch_url):
     for t in targets["logstream"]:
         region_name = t["region"]
         log_group = t["group"]
@@ -62,13 +62,13 @@ def transfer_events(targets, timestart, timeend):
 
         cleanup_file2file(raw_path, clean_path)
 
-        command = """timesketch_importer --host http://localhost:80 \
+        command = """timesketch_importer --host '{}' \
                 --timeline_name '{}' \
                 --sketch_id 1 \
                 --username admin \
                 --password admin \
                 {}
-        """.format(stream_sane_name, clean_path)
+        """.format(timesketch_url, stream_sane_name, clean_path)
 
         os.system(command)
 
@@ -84,4 +84,4 @@ if __name__ == "__main__":
     with open(args.inputfile, "r") as f:
         targets = json.load(f)
 
-    transfer_events(targets, args.timestart, args.timeend)
+    transfer_events(targets, args.timestart, args.timeend, "http://localhost:80")
