@@ -115,8 +115,8 @@ def read_integer(prompt, min_val, max_val):
         user_in = input(prompt)
 
         # check if wants to quit
-        if "exit" in user_in or "quit" in user_in:
-            return -1
+        if "exit" in user_in or "quit" in user_in or "q" in user_in:
+            return None
 
         # try parsing number
         try:
@@ -129,6 +129,15 @@ def read_integer(prompt, min_val, max_val):
             print(e)
             print("Error, please try again")
 
+def read_string(prompt):
+    while True:
+        user_in = input(prompt)
+
+        # check if wants to quit
+        if "exit" in user_in or "quit" in user_in or "q" in user_in:
+            return None
+
+        return user_in.strip()
 
 if __name__ == "__main__":
     args = get_parser("Example parser", []).parse_args()
