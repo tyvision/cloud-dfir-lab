@@ -24,6 +24,22 @@
           - docker-compose
           - iptables-persistent
 
+    # Without this user can only run docker commands via SUDO
+    # But running via SUDO means you can not pass env variables
+    # So the fix is to add user to group "docker"
+    - name: Group docker exists
+      become: yes
+      group:
+        name: docker
+        state: present
+
+    - name: Adding {{ ansible_user_id }} to group docker
+      become: yes
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+
     - name: Create project directory
       file:
         path: "{{ v_proj }}"
@@ -94,7 +110,18 @@
           - "AWS_SECRET_ACCESS_KEY=XXX"
           - "You can set them in {{ v_proj }}/{{ v_aws_env }} file, it will be sourced from ~/.bashrc automatically."
 
-    - name: "Please, manually run docker-compose to finish installation"
+    - name: "Please, run docker-compose to start Timesketch services manually post-install"
       debug:
         msg:
           - "To complete this deployment, manually run 'docker-compose up' in {{ v_proj }}/docker directory"
+
+    - name: "Please, create a new sketch in timesketch manually post-install"
+      debug:
+        msg:
+          - "Complete this deployment by manually creating a new sketch in Timesketch"
+          - "To access Timesketch you must tunnel HTTP over SSH"
+          - "To tunnel local port 8000 to any remote port on remote machine, run:"
+          - "ssh -i /path/to/private_key -D 8000 -q -C -N user@cloud-ip"
+          - "Then configure your browser to use localhost:8000 as SOCKS proxy"
+          - "Then access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
+
