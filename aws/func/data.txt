@@ -1,5 +1,0 @@
-/aws/rds/instance/artem1/postgresql:['artem1.0']
-/aws/rds/instance/artem2/postgresql:['artem2.0']
-RDSOSMetrics:['db-KQFXALKUCZHCARNXDMBWEKSUSY', 'db-FW5KPLSVMBV5AU5T2HCNMZM7TA']
-artem-vpc:['eni-0179683f4c01c060a-all', 'eni-049f734adb12b5de9-all']
-test:[]
