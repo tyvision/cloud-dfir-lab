@@ -48,10 +48,23 @@
         insertafter: EOF
         line: "source {{ v_proj }}/{{ v_aws_env}}"
 
-    - name: Copy docker-compose configuration
+    - name: Copy docker configuration
       copy:
-        src: "{{ playbook_dir }}/../docker/docker-compose.yml"
-        dest: "{{ v_proj }}/"
+        src: "{{ playbook_dir }}/../docker/"
+        dest: "{{ v_proj }}/docker/"
+
+    # Must copy code, so a docker container can be build on the laboratory machine
+    # Can not push pre-build container to registry, because code inside container must be private
+    - name: Copy code dependencies config
+      copy:
+        src: "{{ playbook_dir }}/../config/requirements.txt"
+        dest: "{{ v_proj }}/config/"
+
+    - name: Copy code
+      copy:
+        src: "{{ playbook_dir }}/../code/"
+        dest: "{{ v_proj }}/code/"
+        mode: '700'
 
     # to flush iptables rules "iptables -F"
     # to view iptables rules "iptables -S DOCKER-USER"
@@ -84,4 +97,4 @@
     - name: "Please, manually run docker-compose to finish installation"
       debug:
         msg:
-          - "To complete this deployment, manually run 'docker-compose up' in {{ v_proj }}/ directory"
+          - "To complete this deployment, manually run 'docker-compose up' in {{ v_proj }}/docker directory"
