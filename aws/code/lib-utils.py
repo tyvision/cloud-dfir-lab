@@ -95,6 +95,10 @@ def sanitize_fname(s):
     s = s.replace('.', '-')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
+def build_sane_basename(fname_components):
+    raw_basename = "_".join(fname_components)
+    return sanitize_fname(raw_basename)
+
 def build_out_path(outdir, fname_components):
     raw_basename = "_".join(fname_components)
     fname = sanitize_fname(raw_basename) + ".json"

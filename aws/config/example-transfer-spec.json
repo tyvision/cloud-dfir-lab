@@ -1,0 +1,18 @@
+{
+    "logstream" : [
+        {
+            "region" : "us-east-2"
+            , "group" : "artem-vpc"
+            , "stream" : "eni-049f734adb12b5de9-all"
+            , "cleanup-plugin": "vpc"
+        }
+        , {
+            "region" : "us-east-2"
+            , "group" : "artem-vpc"
+            , "stream" : "eni-0179683f4c01c060a-all"
+            , "cleanup-plugin": "vpc"
+        }
+    ]
+    , "s3" : [ ]
+    , "metric" : [ ]
+}

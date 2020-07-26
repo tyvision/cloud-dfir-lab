@@ -13,6 +13,15 @@ from pprint import pprint
 import importlib
 lib_utils = importlib.import_module("lib-utils")
 
+example = """
+Example vpc log event:
+    {
+        "timestamp": 1595563795000,
+        "message": "2 173155781878 eni-049f734adb12b5de9 92.63.197.95 10.0.0.249 40378 33992 6 1 40 1595563795 1595563819 REJECT OK",
+        "ingestionTime": 1595563830909
+    },
+
+"""
 
 def get_parser():
     helptext="""
@@ -26,18 +35,52 @@ into https://github.com/google/timesketch/blob/master/docs/CreateTimelineFromJSO
     ]
     return lib_utils.get_parser(helptext, args)
 
+def clean_vpc_responce(in_aws_responce):
+    output = []
+    events = in_aws_responce["events"]
+    for e in events:
+        del e["ingestionTime"]
 
-def clean_vpc_json(inpath, outpath):
-    """
-    Example vpc log event:
-        {
-            "timestamp": 1595563795000,
-            "message": "2 173155781878 eni-049f734adb12b5de9 92.63.197.95 10.0.0.249 40378 33992 6 1 40 1595563795 1595563819 REJECT OK",
-            "ingestionTime": 1595563830909
-        },
+        e["datetime"] = datetime.utcfromtimestamp( e["timestamp"] / 1000 ).isoformat()
+        del e["timestamp"]
 
-    """
+        e["timestamp_desc"] = "Flow event captured"
 
+        output.append(e)
+    return output
+
+
+def clean_vpc_json(injson):
+    output = []
+    events = ijson.items(injson, 'events.item')
+    for e in events:
+        del e["ingestionTime"]
+
+        e["datetime"] = datetime.utcfromtimestamp( e["timestamp"] / 1000 ).isoformat()
+        del e["timestamp"]
+
+        e["timestamp_desc"] = "Flow event captured"
+
+        output.append(e)
+    return output
+
+
+def clean_vpc_responce_to_file(in_aws_responce, outpath):
+    with open(outpath, "w") as outfile:
+        events = in_aws_responce["events"]
+        for e in events:
+            del e["ingestionTime"]
+
+            e["datetime"] = datetime.utcfromtimestamp( e["timestamp"] / 1000 ).isoformat()
+            del e["timestamp"]
+
+            e["timestamp_desc"] = "Flow event captured"
+
+            outfile.write(json.dumps(e))
+            outfile.write("\n")
+
+
+def cleanup_file2file(inpath, outpath):
     with open(inpath, "r") as infile, open(outpath, "w") as outfile:
         events = ijson.items(infile, 'events.item')
         for e in events:
@@ -54,4 +97,4 @@ def clean_vpc_json(inpath, outpath):
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-    clean_vpc_json(args.inputfile, args.outputfile)
+    cleanup_file2file(args.inputfile, args.outputfile)
