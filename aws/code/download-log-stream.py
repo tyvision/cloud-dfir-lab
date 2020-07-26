@@ -27,7 +27,7 @@ def get_parser():
 def time2boto(t):
     return int(t.timestamp()) * 1000
 
-def get_log_stream(region_name, log_group, log_stream, tstart, tend, outdir):
+def get_log_stream(region_name, log_group, log_stream, tstart, tend):
     client = boto3.client('logs', region_name=region_name)
 
     responce = client.get_log_events(
@@ -67,5 +67,5 @@ def download_log_stream_to_file(region_name, log_group, log_stream, tstart, tend
 
 if __name__=="__main__":
     args = get_parser().parse_args()
-    res = get_log_stream(args.region, args.group, args.stream, args.timestart, args.timeend, args.outdir)
+    res = get_log_stream(args.region, args.group, args.stream, args.timestart, args.timeend)
     pprint(res)
