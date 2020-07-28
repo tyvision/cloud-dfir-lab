@@ -14,12 +14,11 @@ WORKDIR /root/cloud-dfir
 COPY ./config/requirements.txt ./
 RUN pip3 install -r requirements.txt
 
-COPY ./logcollector/*.py ./
+COPY ./logcollector/ ./
 
 # the code expects environment variables, here they are left empty
 ENV AWS_ACCESS_KEY_ID=
 ENV AWS_SECRET_ACCESS_KEY=
 
-CMD ["sleep", "infinity"]
-# CMD ["./frontend-cli.py"]
+CMD ["./frontend-webgui.py"]
 # CMD ["/bin/sh"]
