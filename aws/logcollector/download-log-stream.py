@@ -8,6 +8,7 @@ import boto3
 from pprint import pprint
 
 import importlib
+import os
 lib_utils = importlib.import_module("lib-utils")
 
 
@@ -27,8 +28,8 @@ def get_parser():
 def time2boto(t):
     return int(t.timestamp()) * 1000
 
-def get_log_stream(region_name, log_group, log_stream, tstart, tend):
-    client = boto3.client('logs', region_name=region_name)
+def download_log_stream_to_path(region_name, log_group, log_stream, tstart, tend, fpath, aws_id=None, aws_secret=None):
+    client = boto3.client('logs', region_name=region_name, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
 
     responce = client.get_log_events(
         logGroupName=log_group,
@@ -37,35 +38,10 @@ def get_log_stream(region_name, log_group, log_stream, tstart, tend):
         endTime=time2boto(tend)
     )
 
-    return responce
-
-def download_log_stream_to_path(region_name, log_group, log_stream, tstart, tend, fpath):
-    client = boto3.client('logs', region_name=region_name)
-
-    responce = client.get_log_events(
-        logGroupName=log_group,
-        logStreamName=log_stream,
-        startTime=time2boto(tstart),
-        endTime=time2boto(tend)
-    )
-
-    lib_utils.write_responce(fpath, responce)
-
-def download_log_stream_to_file(region_name, log_group, log_stream, tstart, tend, outdir):
-    client = boto3.client('logs', region_name=region_name)
-
-    responce = client.get_log_events(
-        logGroupName=log_group,
-        logStreamName=log_stream,
-        startTime=time2boto(tstart),
-        endTime=time2boto(tend)
-    )
-
-    fpath = lib_utils.build_out_path(outdir, [region_name, log_group, log_stream])
     lib_utils.write_responce(fpath, responce)
 
 
 if __name__=="__main__":
     args = get_parser().parse_args()
-    res = get_log_stream(args.region, args.group, args.stream, args.timestart, args.timeend)
-    pprint(res)
+    outpath = os.path.join(args.outdir, "test-log-stream.json")
+    download_log_stream_to_path(args.region, args.group, args.stream, args.timestart, args.timeend, args.outdir )

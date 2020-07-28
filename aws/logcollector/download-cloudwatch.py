@@ -34,8 +34,8 @@ def get_parser():
     return lib_utils.get_parser(helptext, args)
 
 
-def download_metric(region, namespace, metric, timestart, timeend):
-    client = boto3.client('cloudwatch', region_name=region)
+def download_metric(region, namespace, metric, timestart, timeend, aws_id=None, aws_secret=None):
+    client = boto3.client('cloudwatch', region_name=region, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
 
     responce = client.get_metric_statistics(
         Namespace=namespace,
@@ -60,6 +60,5 @@ def download_metric(region, namespace, metric, timestart, timeend):
 
 if __name__=='__main__':
     args = get_parser().parse_args()
-
     res = download_metric(args.region, args.namespace, args.metric, args.timestart, args.timeend)
     pprint(res)

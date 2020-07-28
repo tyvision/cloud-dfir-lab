@@ -17,10 +17,10 @@ This script does not need any arguments.
     args = []
     return lib_utils.get_parser(helptext, args)
 
-def list_regions():
+def list_regions(aws_id, aws_secret):
     # this must be 'ec2'
     # region can be any valid region
-    client = boto3.client( 'ec2', region_name='us-east-1' )
+    client = boto3.client( 'ec2', region_name='us-east-1', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
     responce = client.describe_regions()
     names = [region['RegionName'] for region in responce['Regions']]
     return names
@@ -42,11 +42,11 @@ def list_region_log_group_log_streams(client, log_group):
     names = [stream['logStreamName'] for stream in responce['logStreams']]
     return names
 
-def list_hierarchy():
+def list_hierarchy(aws_id=None, aws_secret=None):
     res = {}
-    for reg in list_regions():
+    for reg in list_regions(aws_id, aws_secret):
         res[reg] = {}
-        client = boto3.client('logs', region_name=reg)
+        client = boto3.client('logs', region_name=reg, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
         for group in list_region_log_groups(client):
             res[reg][group] = []
             for stream in list_region_log_group_log_streams(client, group):

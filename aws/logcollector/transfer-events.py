@@ -35,15 +35,21 @@ See example spec in config/example-transfer-spec.json
     ]
     return lib_utils.get_parser(helptext, args)
 
+def find_cleanup_plugin(target_info, raw_path):
+    return cleanup_plugins.get( target_info["cleanup-plugin"] )
+
 def recreate_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
 
-def find_cleanup_plugin(target_info, raw_path):
-    return cleanup_plugins.get( target_info["cleanup-plugin"] )
+def transfer_events(targets, timestart, timeend, timesketch_url, aws_id=None, aws_secret=None):
+    rawdir = './rawlogs/'
+    cleandir = "./cleanlogs/"
 
-def transfer_events(targets, timestart, timeend, timesketch_url):
+    recreate_dir(rawdir)
+    recreate_dir(cleandir)
+
     for t in targets["logstream"]:
         region_name = t["region"]
         log_group = t["group"]
@@ -52,7 +58,7 @@ def transfer_events(targets, timestart, timeend, timesketch_url):
         stream_sane_name = lib_utils.build_sane_basename([region_name, log_group, log_stream])
 
         raw_path = os.path.join(rawdir, stream_sane_name) + ".json"
-        download_log_stream.download_log_stream_to_path(region_name, log_group, log_stream, timestart, timeend, raw_path)
+        download_log_stream.download_log_stream_to_path(region_name, log_group, log_stream, timestart, timeend, raw_path, aws_id, aws_secret)
 
         clean_path = os.path.join(cleandir, stream_sane_name) + ".jsonl"
         cleanup_file2file = find_cleanup_plugin(t, raw_path)
@@ -77,9 +83,6 @@ def transfer_events(targets, timestart, timeend, timesketch_url):
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-
-    recreate_dir(rawdir)
-    recreate_dir(cleandir)
 
     with open(args.inputfile, "r") as f:
         targets = json.load(f)

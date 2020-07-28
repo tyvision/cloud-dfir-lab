@@ -19,8 +19,8 @@ def get_parser():
     ]
     return lib_utils.get_parser(helptext, args)
 
-def download_dir_from_s3(bucket_name, prefix, region, outdir):
-    resource = boto3.resource('s3', region_name=region)
+def download_dir_from_s3(bucket_name, prefix, region, outdir, aws_id=None, aws_secret=None):
+    resource = boto3.resource('s3', region_name=region, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
     bucket = resource.Bucket(bucket_name)
 
     for obj in bucket.objects.filter(Prefix = prefix):

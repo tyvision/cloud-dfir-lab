@@ -106,24 +106,18 @@ def get_targets():
     pprint(targets)
     return targets
 
-def recreate_dir(path):
-    if os.path.exists(path):
-        shutil.rmtree(path)
-    os.makedirs(path)
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-
-    recreate_dir(rawdir)
-    recreate_dir(cleandir)
-
     targets = get_targets()
 
     # with open("../config/example-transfer-spec.json", "r") as f:
     #     import json
     #     targets = json.load(f)
 
-    # this is an environment variable to make it friendly to docker-compose
+    # timesketch url is an env variable to make it friendly to docker-compose
     timesketch_url = os.getenv('TIMESKETCH_ADDRESS', "http://localhost:80")
+    aws_id = os.getenv('AWS_ACCESS_KEY_ID', None)
+    aws_secret = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
-    transfer_events.transfer_events(targets, args.timestart, args.timeend, timesketch_url)
+    transfer_events.transfer_events(targets, args.timestart, args.timeend, timesketch_url, aws_id, aws_secret)
