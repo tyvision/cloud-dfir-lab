@@ -144,19 +144,11 @@ Playbook is made to run against infrastructure created by terraform.
 
 1) Setup environment variables.
 
-You can either directly export them into your shell:
+You can directly export them into your shell:
 
 ```
 export AWS_ACCESS_KEY_ID=XXX
 export AWS_SECRET_ACCESS_KEY=XXX
-```
-
-Or you can source them from file:
-
-```
-# cp config/example-aws-credentials.sh aws-credentials.sh
-# vim aws-credentials.sh
-# source aws-credentials.sh
 ```
 
 2) Run docker-compose
