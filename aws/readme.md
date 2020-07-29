@@ -275,15 +275,15 @@ For postgres: docker attach to container. Then "psql --username=timesketch --pas
 See databases: \list
 See tables: \dt
 
-Try importing test events: aws/config/example-events.jsonl
+Try importing test events: aws/config/example-events-timesketch.jsonl
 For some readon web interface does not work.
 
 Using command line works:
 
-Docker cp example-events.jsonl into `e2e_timesketch_1` container. Then attach to that container.
+Docker cp example-events-timesketch.jsonl into `e2e_timesketch_1` container. Then attach to that container.
 
 ```
-# docker cp example-events.jsonl e2e_timesketch_1:/
+# docker cp example-events-timesketch.jsonl e2e_timesketch_1:/
 # docker exec -it e2e_timesketch_1 /bin/bash
 ```
 
@@ -291,7 +291,7 @@ Use tsctl to import.
 
 ```
 # tsctl list_sketches
-# tsctl import --sketch_id 1 --file example-events.jsonl --timeline_name test1 --user admin
+# tsctl import --sketch_id 1 --file example-events-timesketch.jsonl --timeline_name test1 --user admin
 
 ```
 
@@ -406,7 +406,7 @@ They are actually part of the file plugin.
 To add new events and see how they work use:
 ```
 # cd aws
-# cat config/example-events-logstash-1.jsonl >> output/file_2.jsonl
+# cat config/example-events-logstash.jsonl >> output/file_2.jsonl
 ```
 
 Output will be on stdout.
@@ -480,7 +480,7 @@ timesketch=# select * from searchindex;
  id |         created_at         |         updated_at         |       name       |   description    |            index_name            | user_id
 ----+----------------------------+----------------------------+------------------+------------------+----------------------------------+---------
   1 | 2020-07-23 16:42:41.040877 | 2020-07-23 16:42:41.040877 | test1            | test1            | 6ae91f0374634aa9a06186e9110d6989 |       1
-  2 | 2020-07-24 14:56:20.811376 | 2020-07-24 14:56:20.811376 | example-events-2 | example-events-2 | 86ed7402923a428eb415649222e69694 |       1
+  2 | 2020-07-24 14:56:20.811376 | 2020-07-24 14:56:20.811376 | example-events   | example-events   | 86ed7402923a428eb415649222e69694 |       1
 (2 rows)
 
 ```
