@@ -7,10 +7,11 @@
 ---
 - name: Configure laboratory for Cloud Digital Forencics Incident Responce
 
-  hosts: group_logcollectors
+  hosts: group_cloud_dfir_laboratory
 
   vars:
       v_proj: "~/cloud-dfir"
+      v_docker: "{{ v_proj }}/docker/"
 
   tasks:
     - name: Install pre-requisites
@@ -21,6 +22,7 @@
           - python3-pip
           - docker.io
           - docker-compose
+          - python3-docker
           - iptables-persistent
 
     # Without this user can only run docker commands via SUDO
@@ -32,7 +34,7 @@
         name: docker
         state: present
 
-    - name: Adding {{ ansible_user_id }} to group docker
+    - name: "Adding {{ ansible_user }} to group docker"
       become: yes
       user:
         name: "{{ ansible_user_id }}"
@@ -48,7 +50,7 @@
     - name: Copy docker configuration
       copy:
         src: "{{ playbook_dir }}/../docker/"
-        dest: "{{ v_proj }}/docker/"
+        dest: "{{ v_docker }}/"
 
     # Must copy code, so a docker container can be build on the laboratory machine
     # Can not push pre-build container to registry, because code inside container must be private
@@ -83,19 +85,23 @@
       shell: "iptables-save > /etc/iptables/rules.v4"
       changed_when: false
 
+    - name: Setup python-docker bindings to allow docker ansible module to execute
+      become: yes
+      apt:
+        update_cache: yes
+        pkg:
 
-    - name: "Please, run docker-compose to start Timesketch services manually post-install"
-      debug:
-        msg:
-          - "To complete this deployment, manually run 'docker-compose up' in {{ v_proj }}/docker directory"
+    - name: Run docker-compose to start up necessary services
+      docker_compose:
+        project_src: "{{ v_docker }}/"
+        build: yes
+        state: present
 
     - name: "Please, create a new sketch in timesketch manually post-install"
       debug:
         msg:
-          - "Complete this deployment by manually creating a new sketch in Timesketch"
-          - "To access Timesketch you must tunnel HTTP over SSH"
-          - "To tunnel local port 8000 to any remote port on remote machine, run:"
-          - "ssh -i /path/to/private_key -D 8000 -q -C -N user@cloud-ip"
+          - "To access Timesketch you must tunnel HTTP over SSH, run the following:"
+          - " # ssh -i {{ ansible_ssh_private_key_file }}  -D 8000 -q -C -N {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
           - "Then configure your browser to use localhost:8000 as SOCKS proxy"
-          - "Then access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
+          - "Finally access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
 

@@ -5,9 +5,9 @@
 # see https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html
 all:
   children:
-    group_logcollectors:
+    group_cloud_dfir_laboratory:
       hosts:
-        ec2-52-202-17-121.compute-1.amazonaws.com:
+        laboratory:
           ansible_port: 22
           ansible_host: ec2-52-202-17-121.compute-1.amazonaws.com
           ansible_user: ubuntu
