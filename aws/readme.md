@@ -519,6 +519,7 @@ Both of the above are poor solutions to implement.
 ### Todo Ansible
 - After install print better instructions on how to set up SSH tunnel: Actually use the values of `ansible_ssh_key`, `ansible_user` to compose the command line
   that users can copy-paste into their terminal. See https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#connection-variables
+- Automatically start docker-compose up --build right after installation
 
 ### Todo Docker:
 - Use debian with python already compiled to speed up build time (installing python3 and python3-pip takes a long time)
