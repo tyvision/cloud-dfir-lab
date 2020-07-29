@@ -9,9 +9,9 @@
 3)  Analyse in Timesketch.
 
 
+## Getting started guides
 
-## Getting started with logcollector code
-
+### Getting started with logcollector code
 Every python script has example command line of how to run it in the file header.
 
 Every python script has a  `--help` argument.
@@ -38,10 +38,7 @@ Every python script has a  `--help` argument.
 # python logcollector/cli-choose-logs.py --help
 ```
 
-
-
-## Getting started with Terraform
-
+### Getting started with Terraform
 Useful link:  https://learn.hashicorp.com/terraform/getting-started/install.html
 
 Terraform state is stored remotely in S3 bucket, see `terraform` directive in .tf files.
@@ -70,9 +67,11 @@ Terraform state is stored remotely in S3 bucket, see `terraform` directive in .t
 # cp ~/.aws/config ~/.aws/credentials
 ```
 
-6) Review terraform recipe and create you own SSH key file for the deployed instances.
+6) Review terraform recipe
 
-7) Create infrastructure 
+7) Create you own SSH key file for the deployed instances.
+
+7) Create infrastructure
 
 ```
 # cd terraform/
@@ -80,10 +79,7 @@ Terraform state is stored remotely in S3 bucket, see `terraform` directive in .t
 # terraform show
 ```
 
-
-
-## Getting started with Ansible
-
+### Getting started with Ansible
 Playbook is made to run against infrastructure created by terraform.
 
 0) Check inventory.yml to make sure the correct SSH key and user are set for the instances.
@@ -102,31 +98,7 @@ Playbook is made to run against infrastructure created by terraform.
 # ansible-playbook -i inventory.yml deploy.yml
 ```
 
-
-
-**Developing Ansible scripts**
-
-Its best to test them against a VM. Use vagrant to get Ubuntu 18.04:
-
-```
-# mkdir vm1
-# cd vm1
-# vagrant init hashicorp/bionic64
-# vagrant up
-```
-
-Edit Vagrant file to allow ports and set memory limits.
-Initial connection must be done vagrant ssh, then possible to use plain ssh.
-```
-# cd vm1
-# vagrant ssh
-# ssh -i .vagrant/machines/default/virtualbox/private_key vagrant@127.0.0.1 -p 2222
-```
-
-
-
-## Getting started with Docker:
-
+### Getting started with Docker:
 0) Clone the repository
 ```
 # git clone https://github.com/tyvision/cloud-dfir-lab
@@ -162,10 +134,7 @@ Initial connection must be done vagrant ssh, then possible to use plain ssh.
 # ls -la ./output/
 ```
 
-
-
-## Getting started with docker-compose
-
+### Getting started with docker-compose
 0) Clone the repository
 
 ```
@@ -202,13 +171,30 @@ Or you can source them from file:
 4) Aceess Timesketch to view events from collected logs on `http://localhost:80`
 
 
+## Project desicions, rationale and guidelines
 
-**Security issue**
+### Developing Ansible scripts
+Its best to test them against a VM. Use vagrant to get Ubuntu 18.04:
 
+```
+# mkdir vm1
+# cd vm1
+# vagrant init hashicorp/bionic64
+# vagrant up
+```
+
+Edit Vagrant file to allow ports and set memory limits.
+Initial connection must be done vagrant ssh, then possible to use plain ssh.
+```
+# cd vm1
+# vagrant ssh
+# ssh -i .vagrant/machines/default/virtualbox/private_key vagrant@127.0.0.1 -p 2222
+```
+
+### Accessing services by HTTP over SSH tunnel
 The services in docker-compose bind to  0.0.0.0, that is they listen on all interfaces. This is a security problem, because the services (timesketch,  elasticsearch, postgres, etc) are exposed to the internet. And timesketch does not even use HTTPS.
 
-Protect the services by preventing public access to them (to their ports). They should be accessible only via localhost on the laboratory machine. 
-
+Protect the services by preventing public access to them (to their ports). They should be accessible only via localhost on the laboratory machine.
 
 
 **Remote access to secured services**
@@ -230,7 +216,6 @@ ssh -X -i private_key vagrant@127.0.0.1 -p 2222
 ```
 
 
-
 **Securing services from public access**
 
 Unfortunatelly docker can not be restricted to an interface. The default interface can be set, but it is not restrictive. See: https://docs.docker.com/network/iptables/#setting-the-default-bind-address-for-containers
@@ -238,7 +223,7 @@ Unfortunatelly docker can not be restricted to an interface. The default interfa
 There are three options, the iptable option is currently implemented.
 
 **Option 1: Using iptables rules**
-Use the iptable rules to make the laboratory machine drop new connections if they are not SSH. This rule can be added to INPUT chain or DOCKER-USER chain. Better to add the rule to specific WAN interface e.g. `eth0` so it will not disturb system interfaces e.g. `loopback`, `docker0`. As a result, although the service listens on 0.0.0.0 no new connection can be established with it. 
+Use the iptable rules to make the laboratory machine drop new connections if they are not SSH. This rule can be added to INPUT chain or DOCKER-USER chain. Better to add the rule to specific WAN interface e.g. `eth0` so it will not disturb system interfaces e.g. `loopback`, `docker0`. As a result, although the service listens on 0.0.0.0 no new connection can be established with it.
 
 **Option 2: Using special ports notation**
 Special notation for ports: https://docs.docker.com/compose/compose-file/#ports
@@ -249,7 +234,7 @@ ports:
   - "127.0.0.1:8001:8001"
 ```
 
-However this does not work. The outside connections are still accepted: 
+However this does not work. The outside connections are still accepted:
 
 ```
 # sudo netstat -lntp | head
@@ -274,10 +259,7 @@ networks:
 
 However this does not work as default network is not accessiable even to localhost.
 
-
-
-## Getting started with Timesketch:
-
+## Configuring Timesketch
 Clone, use the e2e directory. Its for end-to-end testing and does not have debug flags. Add kibana crate:
 
 ```
@@ -292,7 +274,7 @@ kibana:
 
 Set timesketch USER and PASSWORD to admin:admin.
 
-Run compose. 
+Run compose.
 
 For kibana: localhost:5601
 For timesketch: localhost:80
@@ -397,15 +379,11 @@ Below is how data gets stored when imported with "tsctl import" cli tool from in
       }
 ```
 
-
-
-## Getting started with Logstsah
-
+## Configuring Logstash
 After timesketch stack is up and running the next step is to load data.
 
 Get logstash docker container that is the same version as elxasticsearch used in timesketch - 7.6.2
 Also attach to the same docker network where timesketch is running.
-
 ```
 # docker pull logstash:7.6.2
 # cd aws
@@ -440,7 +418,7 @@ To add new events and see how they work use:
 ```
 
 Output will be on stdout.
-Note json_lines plugin for file does NOT work, but json plugin works.
+Note `json_lines` plugin for file does NOT work, but json plugin works.
 
 Here is how data imported with logstash looks (compare with that imported by tsctl) from index `logstash-2020.07.24-000001`:
 
@@ -498,10 +476,7 @@ Here is how data imported with logstash looks (compare with that imported by tsc
       }
 ```
 
-
-
-## Problem with Logstash + Timesketch
-
+### Problem with Logstash + Timesketch
 In Timesketch a sketch is made up of timelines. Each timeline is stored in a separate index in the Elasticsearch database. The events of the timeline each become a document in the index. So a timeline with 3 events results in a new index with 3 documents.
 
 Below I imported two timelines into timesketch, one uses index 6ae91f0374634aa9a06186e9110d6989 in elasticsearch database and another uses index 86ed7402923a428eb415649222e69694.
@@ -538,4 +513,30 @@ So while its possible to insert data into db with logstash, to make it work with
 Both of the above are poor solutions to implement.
 
 
+## Todo
+
+### Todo logcollector code
+- Parse google code
+- Pretty web interface
+
+### Todo Terraform
+- Automatically generate new ssh key and place it in /aws/sshkeys/ directory when creating EC2 instance. Possibly using provisioner "local-exec"
+- Currently EC2 references security group "allowall" to allows public traffic to instance, define this group also in terrafrom file.
+- Perhaps generate an ansible inventory file?
+
+### Todo Ansible
+- After install print better instructions on how to set up SSH tunnel: Actually use the values of `ansible_ssh_key`, `ansible_user` to compose the command line
+  that users can copy-paste into their terminal. See https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#connection-variables
+
+### Todo Docker:
+- Use debian with python already compiled to speed up build time (installing python3 and python3-pip takes a long time)
+
+### Todo docker-compose
+All good here.
+
+### Todo Timesketch
+All good here.
+
+### Todo Logstsah
+There is a complex problem with logstash + timesketch integration, waiting for solution.
 
