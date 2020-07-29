@@ -1,18 +1,4 @@
-{
-    "logstream" : [
-        {
-            "region" : "us-east-2"
-            , "group" : "artem-vpc"
-            , "stream" : "eni-049f734adb12b5de9-all"
-            , "cleanup-plugin": "vpc"
-        }
-        , {
-            "region" : "us-east-2"
-            , "group" : "artem-vpc"
-            , "stream" : "eni-0179683f4c01c060a-all"
-            , "cleanup-plugin": "vpc"
-        }
-    ]
-    , "s3" : [ ]
-    , "metric" : [ ]
-}
+{ "cloud": "aws" , "storage" : "logstream" ,    "cleanup": "vpc" ,          "region" : "us-east-2" , "group" : "artem-vpc" , "stream" : "eni-049f734adb12b5de9-all" }
+{ "cloud": "aws" , "storage" : "logstream" ,    "cleanup": "vpc" ,          "region" : "us-east-2" , "group" : "artem-vpc" , "stream" : "eni-049f734adb12b5de9-all" }
+{ "cloud": "gcp" , "storage" : "bucket" ,       "cleanup": "cloudaudit" ,   "bucket" : "save-logs" ,        "prefix" : "cloudaudit.googleapis.com/activity/2020/07/10/15:00:00_15:59:59_S0.json" }
+{ "cloud": "gcp" , "storage" : "bucket" ,       "cleanup": "cloudaudit" ,   "bucket" : "images-exports" ,   "prefix" : "cloudaudit.googleapis.com/activity/2020/07/28/21:00:00_21:59:59_S0.json" }
