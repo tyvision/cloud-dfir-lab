@@ -103,7 +103,7 @@ def cleanup_file2file(inpath, outpath):
 
             if "request" in event["protoPayload"]:
                 clean["request"] = event["protoPayload"]["request"]
-            if "responce" in event["protoPayload"]:
+            if "response" in event["protoPayload"]:
                 clean["response"] = event["protoPayload"]["response"]
             clean["severity"] = event["severity"]
 

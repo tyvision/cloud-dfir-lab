@@ -26,12 +26,12 @@ def get_parser():
 def list_metric(region_name, namespace, metric, outdir, aws_id=None, aws_secret=None):
     client = boto3.client('cloudwatch', region_name=region_name, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
 
-    responce = client.list_metrics(
+    response = client.list_metrics(
         Namespace=namespace,
         MetricName=metric
     )
 
-    return responce
+    return response
 
 
 if __name__=='__main__':

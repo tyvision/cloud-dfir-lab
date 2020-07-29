@@ -31,14 +31,14 @@ def time2boto(t):
 def download_log_stream_to_path(region_name, log_group, log_stream, tstart, tend, fpath, aws_id=None, aws_secret=None):
     client = boto3.client('logs', region_name=region_name, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
 
-    responce = client.get_log_events(
+    response = client.get_log_events(
         logGroupName=log_group,
         logStreamName=log_stream,
         startTime=time2boto(tstart),
         endTime=time2boto(tend)
     )
 
-    lib_utils.write_responce(fpath, responce)
+    lib_utils.write_response(fpath, response)
 
 
 if __name__=="__main__":

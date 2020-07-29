@@ -105,9 +105,9 @@ def build_out_path(outdir, fname_components):
     return os.path.join(outdir, fname)
 
 
-def write_responce(dest_path, responce):
+def write_response(dest_path, response):
     with open(dest_path, 'w') as f:
-        f.write(json.dumps(responce))
+        f.write(json.dumps(response))
 
 
 def read_integer(prompt, min_val, max_val):

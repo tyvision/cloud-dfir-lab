@@ -21,25 +21,25 @@ def list_regions(aws_id, aws_secret):
     # this must be 'ec2'
     # region can be any valid region
     client = boto3.client( 'ec2', region_name='us-east-1', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
-    responce = client.describe_regions()
-    names = [region['RegionName'] for region in responce['Regions']]
+    response = client.describe_regions()
+    names = [region['RegionName'] for region in response['Regions']]
     return names
 
 def list_region_log_groups(client):
-    responce = client.describe_log_groups(
+    response = client.describe_log_groups(
             limit=50
     )
-    names = [group['logGroupName'] for group in responce['logGroups']]
+    names = [group['logGroupName'] for group in response['logGroups']]
     return names
 
 def list_region_log_group_log_streams(client, log_group):
-    responce = client.describe_log_streams(
+    response = client.describe_log_streams(
         logGroupName=log_group,
         orderBy='LogStreamName',
         descending=True,
         limit=50
     )
-    names = [stream['logStreamName'] for stream in responce['logStreams']]
+    names = [stream['logStreamName'] for stream in response['logStreams']]
     return names
 
 def list_hierarchy(aws_id=None, aws_secret=None):
