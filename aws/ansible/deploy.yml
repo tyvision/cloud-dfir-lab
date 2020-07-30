@@ -22,8 +22,13 @@
           - python3-pip
           - docker.io
           - docker-compose
-          - python3-docker
           - iptables-persistent
+
+    - name: Install ansible modules for docker-compose control
+      pip:
+        name:
+          - docker
+          - docker-compose
 
     # Without this user can only run docker commands via SUDO
     # But running via SUDO means you can not pass env variables
@@ -40,6 +45,9 @@
         name: "{{ ansible_user_id }}"
         groups: docker
         append: yes
+
+    - name: Reset SSH connection to refresh user groups
+      meta: reset_connection
 
     - name: Create project directory
       file:
@@ -85,12 +93,6 @@
       shell: "iptables-save > /etc/iptables/rules.v4"
       changed_when: false
 
-    - name: Setup python-docker bindings to allow docker ansible module to execute
-      become: yes
-      apt:
-        update_cache: yes
-        pkg:
-
     - name: Run docker-compose to start up necessary services
       docker_compose:
         project_src: "{{ v_docker }}/"
@@ -103,5 +105,6 @@
           - "To access Timesketch you must tunnel HTTP over SSH, run the following:"
           - " # ssh -i {{ ansible_ssh_private_key_file }}  -D 8000 -q -C -N {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
           - "Then configure your browser to use localhost:8000 as SOCKS proxy"
-          - "Finally access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
+          - "Access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
+          - "Finally access the logcollector web gui at http://{{ ansible_default_ipv4.address }}:9000"
 
