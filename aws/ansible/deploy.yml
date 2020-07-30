@@ -102,9 +102,9 @@
     - name: "Please, create a new sketch in timesketch manually post-install"
       debug:
         msg:
-          - "To access Timesketch you must tunnel HTTP over SSH, run the following:"
+          - "Step 1: To access Timesketch you must tunnel HTTP over SSH, create the tunnel:"
           - " # ssh -i {{ ansible_ssh_private_key_file }}  -D 8000 -q -C -N {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
-          - "Then configure your browser to use localhost:8000 as SOCKS proxy"
-          - "Access Timesketch web GUI at http://{{ ansible_default_ipv4.address }}:80"
-          - "Finally access the logcollector web gui at http://{{ ansible_default_ipv4.address }}:9000"
+          - "Step 2: Force your browser to use SOCKS proxy at localhost:8000"
+          - "Step 3: Access Timesketch web GUI at http://{{ ansible_host }}:80"
+          - "Step 4: Access the logcollector web gui at http://{{ ansible_host }}:9000"
 
