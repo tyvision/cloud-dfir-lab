@@ -6,6 +6,7 @@
 from google.oauth2 import service_account
 from google.cloud import storage
 import os
+import json
 
 import importlib
 lib_utils = importlib.import_module("lib-utils")
@@ -35,6 +36,22 @@ def list_gcp_buckets(gcp_secret_json=None):
             res[bucket.name].append(blob.name)
 
     return res
+
+def list_gcp_buckets_jsonl(gcp_secret_json=None):
+    raw = list_gcp_buckets(gcp_secret_json)
+    res = ""
+    for bucket_name, blob_names in raw.items():
+        for bname in blob_names:
+            item = {
+                "cloud" : "gcp",
+                "storage" : "bucket",
+                "cleanup" : "default",
+                "bucket" : bucket_name,
+                "prefix" : bname,
+            }
+            res += json.dumps(item, indent=4, sort_keys=True) + "\n"
+    return res
+
 
 if __name__=='__main__':
     from pprint import pprint

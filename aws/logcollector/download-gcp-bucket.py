@@ -29,6 +29,12 @@ def build_client(gcp_secret_json=None):
         credentials = None
     return storage.Client(project=project, credentials=credentials)
 
+def download_blob_to_path(bucket_name, prefix, dest_path, gcp_secret_json=None):
+    client = build_client(gcp_secret_json)
+    bucket = client.bucket(bucket_name=bucket_name)
+    blob = storage.blob.Blob(prefix, bucket)
+    blob.download_to_filename(dest_path)
+
 def download_dir_from_gcp(bucket_name, prefix, outdir, gcp_secret_json=None):
     client = build_client(gcp_secret_json)
     bucket = client.bucket(bucket_name=bucket_name)

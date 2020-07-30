@@ -23,7 +23,7 @@ function getStorage(storage) {
 </script>
 
 <h1>View available items</h1>
-<p>Make sure to first configure AWS security credentials:<p>
+<p>Make sure to first configure AWS/GCP security credentials:<p>
 <a href="/display/settings">Settings</a>
 
 <br>
@@ -38,6 +38,8 @@ function getStorage(storage) {
 <button type="button" onclick="getStorage('logstream')">Update list of Log Streams</button>
 %elif storage == "cloudwatch":
 <button type="button" onclick="getStorage('cloudwatch')">Update list of Cloud Watch Metrics</button>
+%elif storage == "gcp-bucket":
+<button type="button" onclick="getStorage('gcp-bucket')">Update list of GCP buckets</button>
 %end
 
 <br>
@@ -46,6 +48,7 @@ function getStorage(storage) {
 <a href="/display/s3">S3 Buckets</a>
 <a href="/display/logstream">Log Streams</a>
 <a href="/display/cloudwatch">Cloud Watch Metrics</a>
+<a href="/display/gcp-bucket">GCP Bucket Blobs</a>
 
 <br>
 

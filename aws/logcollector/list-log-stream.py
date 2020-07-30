@@ -5,6 +5,7 @@
 #
 import boto3
 from pprint import pprint
+import json
 
 import importlib
 lib_utils = importlib.import_module("lib-utils")
@@ -52,6 +53,25 @@ def list_hierarchy(aws_id=None, aws_secret=None):
             for stream in list_region_log_group_log_streams(client, group):
                 res[reg][group].append(stream)
     return res
+
+
+def list_hierarchy_jsonl(aws_id=None, aws_secret=None):
+    res = ""
+    for reg in list_regions(aws_id, aws_secret):
+        client = boto3.client('logs', region_name=reg, aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
+        for group in list_region_log_groups(client):
+            for stream in list_region_log_group_log_streams(client, group):
+                item = {
+                    "cloud" : "aws",
+                    "storage" : "logstream",
+                    "cleanup" : "default",
+                    "region" : reg,
+                    "group" : group,
+                    "stream" : stream,
+                }
+            res += json.dumps(item, indent=4, sort_keys=True) + "\n"
+    return res
+
 
 if __name__=="__main__":
     args = get_parser().parse_args()

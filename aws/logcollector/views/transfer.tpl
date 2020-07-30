@@ -8,7 +8,7 @@ a {
 </style>
 
 <h1>Enter transfer specification</h1>
-<p>Make sure to first configure AWS security credentials:<p>
+<p>Make sure to first configure AWS/GCP security credentials:<p>
 <a href="/display/settings">Settings</a>
 
 <br>
@@ -26,30 +26,46 @@ a {
 <a href="/display/s3">S3 Buckets</a>
 <a href="/display/logstream">Log Streams</a>
 <a href="/display/cloudwatch">Cloud Watch Metrics</a>
+<a href="/display/gcp-bucket">GCP Bucket Blobs</a>
 
 <br>
 
 <p>Example: </p>
 <pre>
 <code>
+
 {
-    "logstream" : [
-        {
-            "region" : "us-east-2"
-            , "group" : "artem-vpc"
-            , "stream" : "eni-049f734adb12b5de9-all"
-            , "cleanup-plugin": "vpc"
-        }
-        , {
-            "region" : "us-east-2"
-            , "group" : "artem-vpc"
-            , "stream" : "eni-0179683f4c01c060a-all"
-            , "cleanup-plugin": "vpc"
-        }
-    ]
-    , "s3" : [ ]
-    , "metric" : [ ]
+    "cloud": "aws"
+    , "storage" : "logstream"
+    , "cleanup": "vpc"
+    , "region" : "us-east-2"
+    , "group" : "artem-vpc"
+    , "stream" : "eni-049f734adb12b5de9-all"
 }
+{
+    "cloud": "aws"
+    , "storage" : "logstream"
+    , "cleanup": "vpc"
+    , "region" : "us-east-2"
+    , "group" : "artem-vpc"
+    , "stream" : "eni-049f734adb12b5de9-all"
+}
+{
+    "cloud": "gcp"
+    , "storage" : "bucket"
+    , "cleanup": "cloudaudit"
+    , "bucket" : "save-logs"
+    , "prefix" : "cloudaudit.googleapis.com/activity/2020/07/28/21:00:00_21:59:59_S0.json"
+}
+{
+    "cloud": "gcp"
+    , "storage" : "bucket"
+    , "cleanup": "cloudaudit"
+    , "bucket" : "images-exports"
+    , "prefix" : "cloudaudit.googleapis.com/activity/2020/07/10/15:00:00_15:59:59_S0.json"
+}
+
+
 </code>
 </pre>
 

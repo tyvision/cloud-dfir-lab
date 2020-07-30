@@ -14,6 +14,7 @@
 # Page with textarea and button, on button press javascript gets textarea content and submits to python backend for download.
 # Time is default from year 2000 to year 3000
 #
+import ijson.backends.python as ijson
 from bottle import request, post, get, route, run, template
 import json
 
@@ -25,14 +26,19 @@ from datetime import datetime
 import importlib
 
 list_log_streams = importlib.import_module("list-log-stream")
+list_gcp_buckets = importlib.import_module("list-gcp-buckets")
 # list_log_streams = importlib.import_module("list-log-stream")
 # list_log_streams = importlib.import_module("list-log-stream")
 transfer_events = importlib.import_module("transfer-events")
 
+aws_id = None
+aws_secret = None
+gcp_secret_json = None
+
 
 @get('/display/<storage>')
 def storage(storage):
-    if not storage in ["s3", "logstream", "cloudwatch"]:
+    if not storage in ["s3", "logstream", "cloudwatch", "gcp-bucket"]:
         print("Invalid storage: {}".format(storage))
         return "Invalid storage: {}".format(storage)
 
@@ -54,28 +60,42 @@ def storage_data():
 
 @get('/action/logstream')
 def storage_data():
-    hierarchy = list_log_streams.list_hierarchy()
-    return json.dumps(hierarchy, indent=4, sort_keys=True)
+    hierarchy = list_log_streams.list_hierarchy_jsonl(aws_id, aws_secret)
+    return hierarchy
 
 @get('/action/cloudwatch')
 def storage_data():
     return 'Not implemented :('
 
+@get('/action/gcp-bucket')
+def storage_data():
+    hierarchy = list_gcp_buckets.list_gcp_buckets_jsonl(gcp_secret_json)
+    return hierarchy
+
+
 @post('/action/settings')
 def apply_settings():
     # get parameters
-    aws_access_key_id = request.forms.get('aws_access_key_id').strip()
-    aws_secret_access_key = request.forms.get('aws_secret_access_key').strip()
+    if request.forms.get('aws_access_key_id'):
+        global aws_id
+        aws_id = request.forms.get('aws_access_key_id').strip()
 
-    # try setting env variables
-    os.environ["AWS_ACCESS_KEY_ID"] = aws_access_key_id
-    os.environ["AWS_SECRET_ACCESS_KEY"] = aws_secret_access_key
+    if request.forms.get('aws_secret_access_key'):
+        global aws_secret
+        aws_secret = request.forms.get('aws_secret_access_key').strip()
+
+    if request.forms.get('gcp_secret_json'):
+        global gcp_secret_json
+        gcp_secret_json = json.loads( request.forms.get('gcp_secret_json') )
 
     return '<p>Success!</p>'
 
+
 @post('/action/transfer')
 def post_transfer():
-    targets = json.loads(request.forms.get('transfer_spec'))
+    raw = request.forms.get('transfer_spec')
+
+    targets = list( ijson.items(raw, '', multiple_values=True) )
     timestart = datetime.fromisoformat(request.forms.get('timestart'))
     timeend =   datetime.fromisoformat(request.forms.get('timeend'))
 
@@ -89,10 +109,8 @@ def post_transfer():
 
     # timesketch url is an env variable to make it friendly to docker-compose
     timesketch_url = os.getenv('TIMESKETCH_ADDRESS', "http://localhost:80")
-    aws_id = os.getenv('AWS_ACCESS_KEY_ID', None)
-    aws_secret = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
-    transfer_events.transfer_events(targets, timestart, timeend, timesketch_url)
+    transfer_events.transfer_events(timesketch_url, targets, timestart, timeend, aws_id=aws_id, aws_secret=aws_secret, gcp_secret_json=gcp_secret_json)
     return "<p>Success!</p>"
 
 port = 9000
