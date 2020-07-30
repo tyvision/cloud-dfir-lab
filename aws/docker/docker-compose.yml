@@ -2,8 +2,6 @@ version: '3'
 services:
   logcollector:
     environment:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
       - TIMESKETCH_ADDRESS=http://timesketch:80
     ports:
       - "9000:9000"
