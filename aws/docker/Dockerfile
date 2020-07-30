@@ -4,7 +4,7 @@
 # Test with
 # docker run -it --env-file docker-credentials.env name/tag
 #
-FROM debian:latest
+FROM python:buster
 
 RUN apt-get update
 RUN apt-get install -y python3 python3-pip
