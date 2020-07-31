@@ -37,6 +37,7 @@ data "aws_ami" "latest_bionic_ubuntu" {
 
 resource "aws_key_pair" "example_ec2" {
   key_name   = "example_ec2_key"
+  # to create key file automatically look into terraform provisioner "local-exec"
   public_key = file("../config/example_ec2_key.pub")
 
   tags = { CreatedBy = "terraform" }
@@ -46,7 +47,7 @@ resource "aws_key_pair" "example_ec2" {
 resource "aws_instance" "logcollector" {
   key_name      = aws_key_pair.example_ec2.key_name
   ami           = data.aws_ami.latest_bionic_ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
   security_groups = ["allowall"]
 
   tags = { CreatedBy = "terraform" }
