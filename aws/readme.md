@@ -510,6 +510,15 @@ Both of the above are poor solutions to implement.
 ### Todo logcollector code
 - Parse google code
 - Pretty web interface
+- cli arg to gcp credentials file in .json format
+- cli arg to aws credentials file in .ini format
+
+- + process aws vpc log
+- process aws cloudtrail log
+- process aws s3 log
+- + process gcp audit log
+- process gcp ? log
+- process gcp ? log
 
 ### Todo Terraform
 - Automatically generate new ssh key and place it in /aws/sshkeys/ directory when creating EC2 instance. Possibly using provisioner "local-exec"
@@ -517,12 +526,12 @@ Both of the above are poor solutions to implement.
 - Perhaps generate an ansible inventory file?
 
 ### Todo Ansible
-- After install print better instructions on how to set up SSH tunnel: Actually use the values of `ansible_ssh_key`, `ansible_user` to compose the command line
+- + After install print better instructions on how to set up SSH tunnel: Actually use the values of `ansible_ssh_key`, `ansible_user` to compose the command line
   that users can copy-paste into their terminal. See https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#connection-variables
-- Automatically start docker-compose up --build right after installation
+- + Automatically start docker-compose up --build right after installation
 
 ### Todo Docker:
-- Use debian with python already compiled to speed up build time (installing python3 and python3-pip takes a long time)
+- + Use debian with python already compiled to speed up build time (installing python3 and python3-pip takes a long time)
 
 ### Todo docker-compose
 All good here.
