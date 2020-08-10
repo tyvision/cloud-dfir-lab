@@ -69,7 +69,7 @@ def list_hierarchy_jsonl(aws_id=None, aws_secret=None):
                     "group" : group,
                     "stream" : stream,
                 }
-            res += json.dumps(item, indent=4, sort_keys=True) + "\n"
+                res += json.dumps(item, indent=4, sort_keys=True) + "\n"
     return res
 
 

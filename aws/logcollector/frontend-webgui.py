@@ -27,8 +27,8 @@ import importlib
 
 list_log_streams = importlib.import_module("list-log-stream")
 list_gcp_buckets = importlib.import_module("list-gcp-buckets")
-# list_log_streams = importlib.import_module("list-log-stream")
-# list_log_streams = importlib.import_module("list-log-stream")
+list_s3 = importlib.import_module("list-s3")
+
 transfer_events = importlib.import_module("transfer-events")
 
 aws_id = None
@@ -56,7 +56,8 @@ def storage():
 
 @get('/action/s3')
 def storage_data():
-    return 'Not implemented :('
+    hierarchy = list_s3.list_hierarchy_jsonl(aws_id, aws_secret)
+    return hierarchy
 
 @get('/action/logstream')
 def storage_data():

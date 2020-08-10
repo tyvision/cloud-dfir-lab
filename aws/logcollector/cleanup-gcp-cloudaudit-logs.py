@@ -90,22 +90,32 @@ target format https://github.com/google/timesketch/blob/master/docs/CreateTimeli
     return lib_utils.get_parser(helptext, args)
 
 def cleanup_file2file(inpath, outpath):
-    with open(inpath, "rb") as infile, open(outpath, "w") as outfile:
+    with open(inpath, "r") as infile, open(outpath, "w") as outfile:
         # GCP cloudaudit logs are JSONL
         for line in infile:
             event = json.loads(line)
 
             clean = {}
+
+            # Secondary fields
+            clean["type"] = event["protoPayload"]["@type"]
+            if "request" in event["protoPayload"]:
+                clean["request"] = event["protoPayload"]["request"]
+                clean["requestMetadata"] = event["protoPayload"]["requestMetadata"]
+            if "response" in event["protoPayload"]:
+                clean["response"] = event["protoPayload"]["response"]
+            clean["severity"] = event["severity"]
+            clean["resource"] = event["resource"]
+            clean["insertId"] = event["insertId"]
+            clean["logName"] = event["logName"]
+            if "operation" in event:
+                clean["operation"] = event["operation"]
+
+            # Primary fields
             # for timestamp, take only first 19 character, thereby dropping milliseconds and time zones
             clean["datetime"] = datetime.fromisoformat( event["timestamp"][:19] ).isoformat()
             clean["message"] = event["protoPayload"]["methodName"]
             clean["timestamp_desc"] = "GPC api event"
-
-            if "request" in event["protoPayload"]:
-                clean["request"] = event["protoPayload"]["request"]
-            if "response" in event["protoPayload"]:
-                clean["response"] = event["protoPayload"]["response"]
-            clean["severity"] = event["severity"]
 
             outfile.write(json.dumps(clean))
             outfile.write("\n")
