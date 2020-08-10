@@ -4,3 +4,4 @@ ijson==3.1.post0
 timesketch-import-client==20200707
 bottle==0.12.18
 google-cloud-storage==1.30.0
+python-dateutil==2.8.1
