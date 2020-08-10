@@ -18,7 +18,7 @@ def get_parser():
         "region"
         , "group"
         , "stream"
-        , "outdir"
+        , "outputfile"
         , "timestart"
         , "timeend"
     ]
@@ -43,5 +43,4 @@ def download_log_stream_to_path(region_name, log_group, log_stream, tstart, tend
 
 if __name__=="__main__":
     args = get_parser().parse_args()
-    outpath = os.path.join(args.outdir, "test-log-stream.json")
-    download_log_stream_to_path(args.region, args.group, args.stream, args.timestart, args.timeend, outpath )
+    download_log_stream_to_path(args.region, args.group, args.stream, args.timestart, args.timeend, args.outputfile )
