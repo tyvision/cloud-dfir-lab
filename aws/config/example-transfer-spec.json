@@ -34,3 +34,10 @@
     , "bucket" : "images-exports"
     , "prefix" : "cloudaudit.googleapis.com/activity/2020/07/10/15:00:00_15:59:59_S0.json"
 }
+{
+    "cloud": "gcp"
+    , "storage": "bucket"
+    , "cleanup": "instance"
+    , "bucket": "save-two"
+    , "prefix": "gce_instance__logs__2020-08-07T08-50.json"
+}

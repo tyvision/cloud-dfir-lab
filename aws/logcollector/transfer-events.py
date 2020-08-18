@@ -22,6 +22,7 @@ cleanup_s3access_logs = importlib.import_module("cleanup-s3access-logs")
 
 download_gcp_bucket = importlib.import_module("download-gcp-bucket")
 cleanup_gcp_cloudaudit_logs = importlib.import_module("cleanup-gcp-cloudaudit-logs")
+cleanup_gcp_instance_logs = importlib.import_module("cleanup-gcp-instance-logs")
 
 rawdir = './rawlogs/'
 cleandir = "./cleanlogs/"
@@ -45,6 +46,7 @@ def find_cleanup(target, raw_path):
         "cloudaudit" : cleanup_gcp_cloudaudit_logs.cleanup_file2file,
         "cloudtrail" : cleanup_cloudtrail_logs.cleanup_file2file,
         "s3access" : cleanup_s3access_logs.cleanup_file2file,
+        "instance" : cleanup_gcp_instance_logs.cleanup_file2file,
     }
 
     return cleanup_functions[ target["cleanup"] ]
