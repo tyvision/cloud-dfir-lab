@@ -98,13 +98,16 @@
         project_src: "{{ v_docker }}/"
         build: yes
         state: present
+        restarted: yes
 
     - name: "Please, create a new sketch in timesketch manually post-install"
       debug:
         msg:
-          - "Step 1: To access Timesketch you must tunnel HTTP over SSH, create the tunnel:"
-          - " # ssh -i {{ ansible_ssh_private_key_file }}  -D 8000 -q -C -N {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
-          - "Step 2: Force your browser to use SOCKS proxy at localhost:8000"
-          - "Step 3: Access Timesketch web GUI at http://{{ ansible_host }}:80"
-          - "Step 4: Access the logcollector web gui at http://{{ ansible_host }}:9000"
+          - "To access Timesketch and Logcollector you must tunnel HTTP over SSH"
+          - "Access Timesketch: create the tunnel:"
+          - " # ssh -i {{ ansible_ssh_private_key_file }} -L localhost:8000:localhost:80 {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
+          - "Access Timesketch web GUI at http://{{ ansible_host }}:80"
+          - "Access Logcollector: create the tunnel:"
+          - " # ssh -i {{ ansible_ssh_private_key_file }} -L localhost:8000:localhost:9000 {{ ansible_user }}@{{ ansible_host }} -p {{ ansible_port }}"
+          - "Access Logcollector web gui at http://{{ ansible_host }}:9000"
 

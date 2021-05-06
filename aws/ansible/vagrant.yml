@@ -7,10 +7,10 @@ all:
   children:
     group_cloud_dfir_laboratory:
       hosts:
-        laboratory:
-          ansible_port: 22
-          ansible_host: ec2-34-201-208-223.compute-1.amazonaws.com
-          ansible_user: ubuntu
-          ansible_ssh_private_key_file: ../config/example_ec2_key
+        laboratory-dev:
+          ansible_port: 2222
+          ansible_host: 127.0.0.1
+          ansible_user: vagrant
+          ansible_ssh_private_key_file: /home/artem/Desktop/vagrant/.vagrant/machines/default/virtualbox/private_key
           ansible_python_interpreter: /usr/bin/python3
           ansible_become_method: sudo

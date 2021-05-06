@@ -11,6 +11,8 @@
 
 ## Getting started guides
 
+The easiest way to run the project on local machine is by using docker-compose.
+
 ### Getting started with logcollector code
 Every python script has example command line of how to run it in the file header.
 

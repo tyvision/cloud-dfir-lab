@@ -4,7 +4,7 @@ services:
     environment:
       - TIMESKETCH_ADDRESS=http://timesketch:80
     ports:
-      - "9000:9000"
+      - "127.0.0.1:9000:9000"
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
@@ -26,7 +26,7 @@ services:
       - TIMESKETCH_USER=admin
       - TIMESKETCH_PASSWORD=admin
     ports:
-      - "80:80"
+      - "127.0.0.1:80:80"
     depends_on:
       - elasticsearch
       - postgres
@@ -41,15 +41,13 @@ services:
     # in smaller deployments with minimal resources
     #  - ES_JAVA_OPTS= -Xms1g -Xmx1g # 1G min/1G max
     image: elasticsearch:7.6.2
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
     restart: always
 
   postgres:
     image: postgres
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_USER=timesketch
       - POSTGRES_PASSWORD=password
