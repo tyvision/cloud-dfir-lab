@@ -20,17 +20,18 @@ lib_utils = importlib.import_module("lib-utils")
 #         "ingestionTime": 1595563830909
 #     },
 
+
 def get_parser():
-    helptext="""
+    helptext = """
 Morph vpc logs into timesketch format.
 from https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-logs-default
 into https://github.com/google/timesketch/blob/master/docs/CreateTimelineFromJSONorCSV.md
 """
     args = [
-        "inputfile"
-        , "outputfile"
+        "inputfile", "outputfile"
     ]
     return lib_utils.get_parser(helptext, args)
+
 
 def cleanup_file2file(inpath, outpath):
     logline = re.compile(r"""
@@ -73,7 +74,7 @@ def cleanup_file2file(inpath, outpath):
             # Secondary fields
             match = logline.match(e["message"])
             if not match:
-                print("Line not matched:\n{}\n".format(line))
+                print("Line not matched:\n{}\n".format(e["message"]))
                 continue
             clean["version"] = match.group('version')
             clean["accound_id"] = match.group('accound_id')
@@ -85,15 +86,19 @@ def cleanup_file2file(inpath, outpath):
             clean["protocol"] = match.group('protocol')
             clean["packets"] = match.group('packets')
             clean["bytes"] = match.group('bytes')
-            clean["start"] = datetime.utcfromtimestamp( int(match.group('start')) ).isoformat()
-            clean["end"] = datetime.utcfromtimestamp( int(match.group('end')) ).isoformat()
+            clean["start"] = datetime.utcfromtimestamp(
+                int(match.group('start'))).isoformat()
+            clean["end"] = datetime.utcfromtimestamp(
+                int(match.group('end'))).isoformat()
             clean["action"] = match.group('action')
             clean["log_status"] = match.group('log_status')
 
             # Primary fields
-            clean["datetime"] = datetime.utcfromtimestamp( e["timestamp"] / 1000 ).isoformat()
+            clean["datetime"] = datetime.utcfromtimestamp(
+                e["timestamp"] / 1000).isoformat()
             clean["timestamp_desc"] = "Flow event captured"
-            clean["message"] = "Packet from {} to {}".format(clean["srcaddr"], clean["dstaddr"])
+            clean["message"] = "Packet from {} to {}".format(
+                clean["srcaddr"], clean["dstaddr"])
 
             outfile.write(json.dumps(clean))
             outfile.write("\n")
