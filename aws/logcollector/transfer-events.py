@@ -21,79 +21,90 @@ cleanup_cloudtrail_logs = importlib.import_module("cleanup-cloudtrail-logs")
 cleanup_s3access_logs = importlib.import_module("cleanup-s3access-logs")
 
 download_gcp_bucket = importlib.import_module("download-gcp-bucket")
-cleanup_gcp_cloudaudit_logs = importlib.import_module("cleanup-gcp-cloudaudit-logs")
-cleanup_gcp_instance_logs = importlib.import_module("cleanup-gcp-instance-logs")
+cleanup_gcp_cloudaudit_logs = importlib.import_module(
+    "cleanup-gcp-cloudaudit-logs")
+cleanup_gcp_instance_logs = importlib.import_module(
+    "cleanup-gcp-instance-logs")
 
 rawdir = './rawlogs/'
 cleandir = "./cleanlogs/"
 
 
 def get_parser():
-    helptext="""
+    helptext = """
 Consumes JSON specification of events to transfer from AWS logs into Timesketch.
 See example spec in config/example-transfer-spec.json
 """
     args = [
-        "inputfile"
-        , "timestart"
-        , "timeend"
+        "inputfile", "timestart", "timeend"
     ]
     return lib_utils.get_parser(helptext, args)
 
+
 def find_cleanup(target, raw_path):
     cleanup_functions = {
-        "vpc" : cleanup_vpc_logs.cleanup_file2file,
-        "cloudaudit" : cleanup_gcp_cloudaudit_logs.cleanup_file2file,
-        "cloudtrail" : cleanup_cloudtrail_logs.cleanup_file2file,
-        "s3access" : cleanup_s3access_logs.cleanup_file2file,
-        "instance" : cleanup_gcp_instance_logs.cleanup_file2file,
+        "vpc": cleanup_vpc_logs.cleanup_file2file,
+        "cloudaudit": cleanup_gcp_cloudaudit_logs.cleanup_file2file,
+        "cloudtrail": cleanup_cloudtrail_logs.cleanup_file2file,
+        "s3access": cleanup_s3access_logs.cleanup_file2file,
+        "instance": cleanup_gcp_instance_logs.cleanup_file2file,
     }
 
-    return cleanup_functions[ target["cleanup"] ]
+    return cleanup_functions[target["cleanup"]]
+
 
 def find_download(target):
     download_functions = {
-        "aws" : {
-            "logstream" : download_aws_logstream_target,
-            "s3" : download_aws_s3_target,
-            "cloudwatch" : None,
+        "aws": {
+            "logstream": download_aws_logstream_target,
+            "s3": download_aws_s3_target,
+            "cloudwatch": None,
         },
-        "gcp" : {
-            "bucket" : download_gcp_bucket_target,
+        "gcp": {
+            "bucket": download_gcp_bucket_target,
         }
     }
 
-    return download_functions[ target["cloud"] ][ target["storage"] ]
+    return download_functions[target["cloud"]][target["storage"]]
+
 
 def download_aws_logstream_target(target, timestart, timeend, aws_id=None, aws_secret=None, gcp_secret_json=None):
     region_name = target["region"]
     log_group = target["group"]
     log_stream = target["stream"]
-    stream_sane_name = lib_utils.build_sane_basename([region_name, log_group, log_stream])
+    stream_sane_name = lib_utils.build_sane_basename(
+        [region_name, log_group, log_stream])
     raw_path = os.path.join(rawdir, stream_sane_name) + ".json"
-    download_log_stream.download_log_stream_to_path(region_name, log_group, log_stream, timestart, timeend, raw_path, aws_id, aws_secret)
+    download_log_stream.download_log_stream_to_path(
+        region_name, log_group, log_stream, timestart, timeend, raw_path, aws_id, aws_secret)
     return raw_path
+
 
 def download_aws_s3_target(target, timestart, timeend, aws_id=None, aws_secret=None, gcp_secret_json=None):
     bucket = target["bucket"]
     key = target["key"]
     sane_path = lib_utils.build_sane_basename(key.split('/'))
     raw_path = os.path.join(rawdir, sane_path) + ".json"
-    download_s3.download_object_from_s3(bucket, key, raw_path, aws_id, aws_secret)
+    download_s3.download_object_from_s3(
+        bucket, key, raw_path, aws_id, aws_secret)
     return raw_path
+
 
 def download_gcp_bucket_target(target, timestart, timeend, aws_id=None, aws_secret=None, gcp_secret_json=None):
     bucket_name = target["bucket"]
     prefix = target["prefix"]
     stream_sane_name = lib_utils.build_sane_basename([bucket_name, prefix])
     raw_path = os.path.join(rawdir, stream_sane_name) + ".json"
-    download_gcp_bucket.download_blob_to_path(bucket_name, prefix, raw_path, gcp_secret_json)
+    download_gcp_bucket.download_blob_to_path(
+        bucket_name, prefix, raw_path, gcp_secret_json)
     return raw_path
+
 
 def recreate_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
+
 
 def transfer_events(timesketch_url, targets, timestart, timeend, aws_id=None, aws_secret=None, gcp_secret_json=None):
     rawdir = './rawlogs/'
@@ -108,7 +119,8 @@ def transfer_events(timesketch_url, targets, timestart, timeend, aws_id=None, aw
         if download is None:
             print("Download function for {} can not be found, can not upload to timesketch. Skipping this entry.".format(target))
             continue
-        raw_path = download(target, timestart, timeend, aws_id, aws_secret, gcp_secret_json)
+        raw_path = download(target, timestart, timeend,
+                            aws_id, aws_secret, gcp_secret_json)
 
         # cleanup log
         clean_path = os.path.join(cleandir, Path(raw_path).stem) + ".jsonl"
@@ -138,9 +150,10 @@ if __name__ == "__main__":
     targets = []
     import ijson.backends.python as ijson
     with open(args.inputfile, "rb") as f:
-        targets = list( ijson.items(f, '', multiple_values=True) )
+        targets = list(ijson.items(f, '', multiple_values=True))
 
-    gcp_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', "../../GCP/CloudToken.json")
+    gcp_credentials_path = os.getenv(
+        'GOOGLE_APPLICATION_CREDENTIALS', "../../GCP/CloudToken.json")
     import json
     with open(gcp_credentials_path, "rb") as f:
         gcp_credentials = json.load(f)
@@ -148,4 +161,5 @@ if __name__ == "__main__":
     aws_id = os.getenv('AWS_ACCESS_KEY_ID', None)
     aws_secret = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
-    transfer_events("http://localhost:80", targets, args.timestart, args.timeend, aws_id=aws_id, aws_secret=aws_secret, gcp_secret_json=gcp_credentials)
+    transfer_events("http://localhost:80", targets, args.timestart, args.timeend,
+                    aws_id=aws_id, aws_secret=aws_secret, gcp_secret_json=gcp_credentials)
