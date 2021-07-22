@@ -16,6 +16,7 @@ lib_utils = importlib.import_module("lib-utils")
 download_log_stream = importlib.import_module("download-log-stream")
 download_s3 = importlib.import_module("download-s3")
 
+cleanup_default = importlib.import_module("cleanup-default")
 cleanup_vpc_logs = importlib.import_module("cleanup-vpc-logs")
 cleanup_cloudtrail_logs = importlib.import_module("cleanup-cloudtrail-logs")
 cleanup_s3access_logs = importlib.import_module("cleanup-s3access-logs")
@@ -43,6 +44,7 @@ See example spec in config/example-transfer-spec.json
 
 def find_cleanup(target, raw_path):
     cleanup_functions = {
+        "default": cleanup_default.cleanup_file2file,
         "vpc": cleanup_vpc_logs.cleanup_file2file,
         "cloudaudit": cleanup_gcp_cloudaudit_logs.cleanup_file2file,
         "cloudtrail": cleanup_cloudtrail_logs.cleanup_file2file,
